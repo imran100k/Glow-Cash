@@ -1,205 +1,93 @@
-<!DOCTYPE html><html lang="bn">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Glow Cash — Mini App</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="https://ad.gigapub.tech/script?id=1731"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#0b0f14;
-      --card:#151c28;     /* outer card */
-      --panel:#1b2433;    /* inner blocks */
-      --text:#e8eef6;
-      --muted:#9aa9bf;
-      --cyan:#06d6c9;     /* primary */
-      --red:#ef4444;      /* reset */
-      --yellow:#facc15;   /* developer */
-      --shadow: 0 12px 32px rgba(0,0,0,.45);
-      --radius: 18px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: 'Noto Sans Bengali', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial;
-      color:var(--text);
-      background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
-      display:grid; place-items:center; padding:18px;
-    }
-    .wrap{width:min(480px,96vw)}/* Header */
-.appbar{
-  display:flex; align-items:center; gap:10px; margin-bottom:14px;
-  color:var(--muted);
-}
-.appbar .title{color:var(--text); font-weight:700; letter-spacing:.2px}
+<!DOCTYPE html><html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mini Max — Telegram Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://ad.gigapub.tech/script?id=1731"></script><style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-2: #a78bfa;
+    --glow: #7f5af0;
+  }
+  *{box-sizing:border-box;} html,body{height:100%;margin:0;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;color:var(--text);background:linear-gradient(135deg, #0f172a, #1e293b);display:grid;place-items:center;padding:24px;}
+  .card{width:min(800px,95vw);background:var(--card);border-radius:24px;padding:30px;box-shadow:0 0 20px rgba(56,189,248,0.5), 0 0 40px rgba(167,139,250,0.3);display:flex;flex-direction:column;align-items:center;transition:0.3s;}
+  .card:hover{box-shadow:0 0 30px rgba(56,189,248,0.8), 0 0 60px rgba(167,139,250,0.6);}
+  h1{margin:0 0 8px;font-size:2rem;letter-spacing:0.5px;text-align:center;text-shadow:0 0 8px var(--accent),0 0 15px var(--accent-2);}
+  p{margin:0 0 16px;color:var(--muted);text-align:center;}
+  .chips{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0 20px;justify-content:center;}
+  .chip{padding:8px 14px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);font-size:13px;text-shadow:0 0 5px rgba(56,189,248,0.6);}
+  .row{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:20px;}
+  button{appearance:none;border:0;cursor:pointer;font-weight:700;border-radius:16px;padding:14px 20px;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#0f172a;transition:all 0.3s ease;box-shadow:0 0 8px var(--accent),0 0 16px var(--accent-2);}
+  button:hover{transform:translateY(-2px);box-shadow:0 0 20px var(--accent),0 0 40px var(--accent-2);}
+  button.secondary{background:rgba(255,255,255,0.08);color:var(--text);box-shadow:0 0 8px rgba(255,255,255,0.3);}
+  button.secondary:hover{background:rgba(255,255,255,0.12);box-shadow:0 0 16px rgba(255,255,255,0.5);}
+  .ad-slot{margin-top:20px;padding:16px;border:2px dashed rgba(255,255,255,0.3);border-radius:16px;text-align:center;min-height:130px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600;box-shadow:0 0 10px rgba(56,189,248,0.3),0 0 20px rgba(167,139,250,0.2);}
+  .footer{margin-top:18px;font-size:13px;color:var(--muted);text-align:center;}
+  .warn{color:#f87171;} a{color:var(--accent);text-decoration:none;}
+</style>
 
-/* Card shell */
-.card{
-  background:linear-gradient(180deg, rgba(255,255,255,.02), transparent 60%), var(--card);
-  border-radius:24px; padding:18px; box-shadow:var(--shadow); border:1px solid rgba(255,255,255,.06);
-}
-
-/* Brand header */
-.brand{
-  background:var(--panel);
-  border-radius:22px; padding:16px; position:relative; margin-bottom:14px;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
-}
-.brand::before{ /* left accent bar */
-  content:""; position:absolute; left:10px; top:10px; bottom:10px; width:4px; border-radius:999px; background:var(--cyan);
-  box-shadow: 0 0 0 2px rgba(6,214,201,.2), 0 6px 16px rgba(6,214,201,.35);
-}
-.brand-row{ display:flex; align-items:center; gap:10px; }
-.logo{
-  width:38px; height:38px; border-radius:12px; background:linear-gradient(135deg, var(--cyan), #53ffe9);
-  display:grid; place-items:center; color:#0b0f14; font-weight:900; box-shadow:0 6px 18px rgba(6,214,201,.45);
-}
-.brand h2{ margin:0; font-size:20px; }
-.brand p{ margin:2px 0 0; color:var(--muted); font-size:13px; }
-
-/* Stats grid */
-.grid{ display:grid; grid-template-columns:1fr; gap:12px; }
-.panel{ background:var(--panel); border-radius:16px; padding:14px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
-.panel h3{ margin:0 0 6px; font-size:13px; color:var(--muted); font-weight:600; letter-spacing:.2px }
-.value{ font-size:28px; font-weight:800; letter-spacing:.3px; }
-.sub{ margin-top:6px; color:var(--muted); font-size:12px }
-.row-2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-
-/* Buttons */
-.actions{ display:grid; grid-template-columns:1fr; gap:10px; margin-top:14px; }
-.btn{ appearance:none; border:0; border-radius:14px; padding:14px; font-weight:800; font-size:15px; cursor:pointer; }
-.btn-primary{ background:linear-gradient(180deg, var(--cyan), #3af1e6); color:#0b0f14; box-shadow:0 10px 24px rgba(6,214,201,.35); }
-.btn-primary:active{ transform:translateY(1px) }
-.row-btns{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.btn-red{ background:linear-gradient(180deg, #ff7878, var(--red)); color:#1b2433; box-shadow:0 10px 24px rgba(239,68,68,.35) }
-.btn-yellow{ background:linear-gradient(180deg, #ffe27a, var(--yellow)); color:#1b2433; box-shadow:0 10px 24px rgba(250,204,21,.35) }
-
-/* Ad slot */
-.ad-slot{ margin-top:12px; background:var(--panel); color:var(--muted); border:1px dashed rgba(255,255,255,.18); border-radius:14px; min-height:110px; display:grid; place-items:center; text-align:center; padding:10px }
-.foot{ margin-top:12px; text-align:center; color:var(--muted); font-size:12px }
-
-@media (min-width:430px){ .grid{ grid-template-columns:1fr } }
-
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="appbar">
-      <div style="font-size:20px">✖</div>
-      <div class="title">Glow Cash</div>
-    </div><div class="card">
-  <div class="brand">
-    <div class="brand-row">
-      <div class="logo">💎</div>
-      <div>
-        <h2>Glow Cash</h2>
-        <p>বিজ্ঞাপন দেখুন, অর্থ উপার্জন করুন</p>
+  </head>
+  <body>
+    <div class="card">
+      <h1>🚀 Mini Max</h1>
+      <p>Telegram Mini App • GitHub + Vercel ready • Giga.pub ads integrated</p>
+      <div class="chips">
+        <span class="chip" id="chipUser">@user</span>
+        <span class="chip" id="chipTheme">theme: —</span>
+        <span class="chip" id="chipPlatform">platform: —</span>
+        <span class="chip" id="chipVersion">tg api: —</span>
       </div>
-    </div>
-  </div>
-
-  <div class="grid">
-    <div class="panel">
-      <h3>আপনার ব্যালেন্স</h3>
-      <div class="value" id="balance">৳0.00</div>
-      <div class="sub">প্রতি বিজ্ঞাপনে আয়: <span id="perAd">৳0.008</span></div>
-    </div>
-
-    <div class="row-2">
-      <div class="panel" style="text-align:center">
-        <div style="font-size:20px; margin-bottom:6px">🖥️</div>
-        <h3>মোট বিজ্ঞাপন</h3>
-        <div class="value" id="totalAds">0</div>
+      <div class="row">
+        <button id="btnHello">Say Hello</button>
+        <button id="btnHaptic" class="secondary">Haptic</button>
+        <button id="btnQR" class="secondary">Scan QR</button>
+        <button id="btnShare" class="secondary">Share</button>
+        <button id="btnAd" class="secondary">Show Interstitial Ad</button>
       </div>
-      <div class="panel" style="text-align:center">
-        <div style="font-size:20px; margin-bottom:6px">🪙</div>
-        <h3>মোট আয়</h3>
-        <div class="value" id="totalEarn">৳0.00</div>
-      </div>
-    </div>
+      <div id="adSlot" class="ad-slot">Banner Ad will load automatically.</div>
+      <div class="footer" id="dbg"></div>
+      <div class="footer">Tip: Open from inside Telegram bot via WebApp button. Host on Vercel (HTTPS).</div>
+    </div><script>
+  function ensureTelegramContext() {
+    const isTG = !!(window.Telegram && window.Telegram.WebApp);
+    if(!isTG){document.getElementById('dbg').innerHTML='<span class="warn">⚠️ Open inside Telegram. Some features disabled.</span>'}
+    return isTG;
+  }
 
-    <div class="actions">
-      <button id="btnWatch" class="btn btn-primary">▶ বিজ্ঞাপন দেখুন</button>
-      <div class="row-btns">
-        <button id="btnReset" class="btn btn-red">↻ রিসেট</button>
-        <button id="btnDev" class="btn btn-yellow">👤 ডেভেলপার</button>
-      </div>
-    </div>
+  const tg = window.Telegram?.WebApp;
+  if(ensureTelegramContext() && tg){
+    tg.ready(); tg.expand();
+    const u=tg.initDataUnsafe?.user;
+    if(u) document.getElementById('chipUser').textContent='@'+(u.username||u.first_name||'user');
+    document.getElementById('chipTheme').textContent='theme: '+tg.colorScheme;
+    document.getElementById('chipPlatform').textContent='platform: '+tg.platform;
+    document.getElementById('chipVersion').textContent='tg api: '+(tg.version||'—');
+    document.getElementById('btnHello').onclick=()=>tg.showAlert('Hello from Mini Max!');
+    document.getElementById('btnHaptic').onclick=()=>tg.HapticFeedback?.impactOccurred('light');
+    document.getElementById('btnQR').onclick=()=>tg.showScanQrPopup({text:'Scan a QR code'},text=>tg.showAlert(text||'No QR data'));
+    document.getElementById('btnShare').onclick=async()=>{if(tg.shareURL)tg.shareURL(window.location.href);else tg.showPopup({title:'Share',message:window.location.href,buttons:[{type:'close'}]})};
+  }
 
-    <div id="adSlot" class="ad-slot">ব্যানার বিজ্ঞাপন স্বয়ংক্রিয়ভাবে লোড হবে</div>
-  </div>
+  document.getElementById('btnAd').onclick=async()=>{
+    try{
+      if(window.gigaPub){ await gigaPub.loadInterstitial(); gigaPub.showInterstitial(); }
+      else tg?.showAlert('Ad script not loaded yet');
+    }catch(e){tg?.showAlert('Ad failed to load');}
+  };
 
-  <div id="dbg" class="foot"></div>
-  <div class="foot">Welcome to (Glow Cash) Telegram Mini App</div>
-</div>
-
-  </div>  <script>
-    // Telegram context
-    const tg = window.Telegram?.WebApp;
-    function ensureTG(){
-      const ok = !!(window.Telegram && window.Telegram.WebApp);
-      if(!ok){ document.getElementById('dbg').innerHTML = '⚠️ Telegram-এর বাইরে খোলা হয়েছে – কিছু ফিচার কাজ নাও করতে পারে'; }
-      else { tg.ready(); tg.expand(); }
-      return ok;
+  function showDummyBanner(){
+    const adSlot=document.getElementById('adSlot');
+    if(adSlot){
+      adSlot.innerHTML='<div style="padding:12px;background:rgba(255,255,255,0.1);border-radius:12px;color:#fff;box-shadow:0 0 10px var(--accent),0 0 20px var(--accent-2);">🎯 Placeholder ad while review is pending.</div>';
     }
-    ensureTG();
+  }
+  setTimeout(()=>{if(document.getElementById('adSlot') && document.getElementById('adSlot').children.length===0) showDummyBanner();},2000);
+</script>
 
-    // ---- Simple local state (persisted) ----
-    const STORE_KEY = 'mmx_gigapub_state_v1';
-    const state = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-    if(state.balance == null) state.balance = 0;
-    if(state.perAd == null) state.perAd = 0.008; // প্রতি বিজ্ঞাপনে আয়
-    if(state.totalAds == null) state.totalAds = 0;
-
-    const $ = (id)=>document.getElementById(id);
-    function fmt(n){ return '৳' + Number(n).toFixed(2); }
-    function render(){
-      $('balance').textContent = fmt(state.balance);
-      $('perAd').textContent = fmt(state.perAd);
-      $('totalAds').textContent = state.totalAds;
-      $('totalEarn').textContent = fmt(state.balance); // same as balance
-      localStorage.setItem(STORE_KEY, JSON.stringify(state));
-    }
-    render();
-
-    // ---- Buttons ----
-    $('btnWatch').onclick = async () => {
-      try{
-        tg?.HapticFeedback?.impactOccurred('light');
-        if(window.gigaPub){
-          await gigaPub.loadInterstitial();
-          gigaPub.showInterstitial();
-        }
-        // সফল বিজ্ঞাপনের পরে আয় যোগ করুন
-        state.totalAds += 1;
-        state.balance = Number((state.balance + state.perAd).toFixed(3));
-        render();
-      }catch(err){
-        tg?.showAlert?.('Ad লোড হয়নি — ডামি আয় যোগ করা হলো');
-        state.totalAds += 1;
-        state.balance = Number((state.balance + state.perAd).toFixed(3));
-        render();
-      }
-    };
-
-    $('btnReset').onclick = () => {
-      state.balance = 0; state.totalAds = 0; render();
-      tg?.HapticFeedback?.impactOccurred('light');
-    };
-
-    $('btnDev').onclick = () => {
-      const dev = 'https://t.me/'; // আপনার টেলিগ্রাম ইউজারনেম দিন
-      if(tg?.openTelegramLink) tg.openTelegramLink(dev);
-      else window.open(dev, '_blank');
-    };
-
-    // ---- Fallback dummy banner if Giga.pub is under review ----
-    function showDummyBanner(){
-      const el = $('adSlot');
-      el.innerHTML = '<div style="padding:10px 12px; background:rgba(6,214,201,.08); border-radius:10px; color:#bff7f2">🎯 Review pending — Placeholder banner</div>';
-    }
-    setTimeout(()=>{ if($('adSlot') && $('adSlot').children.length===0) showDummyBanner(); }, 2200);
-  </script></body>
+  </body>
 </html>
