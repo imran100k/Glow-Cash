@@ -42,6 +42,11 @@
   <button id="themeBtn" class="btn ghost">Toggle Theme</button>
 </div>
 
+<!-- বিজ্ঞাপন বাটন -->
+<button id="adsBtn" class="btn" style="margin-top:12px;background:#f59e0b">
+  📢 বিজ্ঞাপন দেখুন
+</button>
+
 <p class="kicker" id="status">Loading Telegram context…</p>
 <p class="kicker warn">⚠️ Auto‑clicking/automation can violate app rules & Telegram/TOS. This demo intentionally disables any programmatic tapping inside Telegram.</p>
 
@@ -53,6 +58,7 @@
     const tapBtn = document.getElementById('tapBtn');
     const resetBtn = document.getElementById('resetBtn');
     const themeBtn = document.getElementById('themeBtn');
+    const adsBtn = document.getElementById('adsBtn');
 
     let count = 0;
 
@@ -76,12 +82,21 @@
 
     themeBtn.addEventListener('click', () => {
       document.documentElement.classList.toggle('light');
-      // Simple theme toggle (not using Telegram theme params here to keep it portable)
       const light = document.documentElement.classList.contains('light');
       document.documentElement.style.setProperty('--bg', light ? '#f7f8fb' : '#0f1115');
       document.documentElement.style.setProperty('--card', light ? '#ffffff' : '#161a22');
       document.documentElement.style.setProperty('--text', light ? '#0f1115' : '#e7eaf3');
       document.documentElement.style.setProperty('--muted', light ? '#5a647a' : '#9aa4bc');
+    });
+
+    // বিজ্ঞাপন বাটনের হ্যান্ডলার
+    adsBtn.addEventListener('click', () => {
+      if (tg) {
+        tg.sendData(JSON.stringify({ action: 'show_ads' }));
+        tg.HapticFeedback.notificationOccurred('success');
+      } else {
+        alert("বিজ্ঞাপন বাটন ক্লিক হয়েছে (ডেমো মোড)");
+      }
     });
 
     // Telegram integration (safe)
@@ -91,10 +106,9 @@
         tg.ready();
         statusEl.textContent = 'Running inside Telegram Mini App.';
 
-        // Example: handling Main Button press
         tg.onEvent('mainButtonClicked', () => {
           tg.HapticFeedback.impactOccurred('light');
-          tg.close(); // or sendData to the bot
+          tg.close();
         });
       } catch (e) {
         statusEl.textContent = 'Telegram context detected, but init failed.';
@@ -104,14 +118,8 @@
       statusEl.textContent = 'Not in Telegram — running in a normal browser.';
     }
 
-    // --------------
-    // Dev-only helper (outside Telegram):
-    // Controlled programmatic click for QA at a low rate, ONLY when not in Telegram
-    // and only if URL has ?qa=1, and after a user gesture (Start QA).
-    // This is blocked inside Telegram to respect app rules.
-    // --------------
     (function addQaHelper(){
-      if (tg) return; // never enable in Telegram
+      if (tg) return;
       const params = new URLSearchParams(location.search);
       if (!params.has('qa')) return;
       const qaBtn = document.createElement('button');
@@ -124,7 +132,6 @@
         if (qaInterval) { clearInterval(qaInterval); qaInterval = null; qaBtn.textContent = 'Start QA (slow auto-tap)'; return; }
         qaBtn.textContent = 'Stop QA';
         qaInterval = setInterval(() => {
-          // Simulate a *single* safe click every 1s for QA outside Telegram
           tapBtn.click();
         }, 1000);
       });
