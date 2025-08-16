@@ -97,11 +97,14 @@
         // 👉 GigaPub SDK ব্যবহার
         window.showGiga("main")
           .then(() => {
-            // বিজ্ঞাপন সফলভাবে দেখা হয়েছে
+            // বিজ্ঞাপন সফলভাবে দেখা হয়েছে → Reward logic
+            count += 10; // উদাহরণস্বরূপ: প্রতি বিজ্ঞাপন reward +10
+            render();
+
             if (tg) {
-              tg.sendData(JSON.stringify({ action: 'ads_reward' }));
+              tg.sendData(JSON.stringify({ action: 'ads_reward', reward: 10, total: count }));
             }
-            alert("Reward unlocked! 🎉");
+            alert("Reward unlocked! 🎉 +10 পয়েন্ট যোগ হয়েছে।");
           })
           .catch(e => {
             console.error("GigaPub error:", e);
