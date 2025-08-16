@@ -26,6 +26,8 @@
     .ok{color:#9ae6b4}
     code{background:#0c0f14;border:1px solid #222836;border-radius:8px;padding:2px 6px}
   </style>
+  <!-- GigaPub SDK -->
+  <script src="https://ad.gigapub.tech/script?id=1731"></script>
 </head>
 <body>
   <div class="card">
@@ -89,13 +91,30 @@
       document.documentElement.style.setProperty('--muted', light ? '#5a647a' : '#9aa4bc');
     });
 
-    // বিজ্ঞাপন বাটনের হ্যান্ডলার
+    // বিজ্ঞাপন বাটনের হ্যান্ডলার (GigaPub integration সহ)
     adsBtn.addEventListener('click', () => {
-      if (tg) {
-        tg.sendData(JSON.stringify({ action: 'show_ads' }));
-        tg.HapticFeedback.notificationOccurred('success');
+      if (typeof window.showGiga === "function") {
+        // 👉 GigaPub SDK ব্যবহার
+        window.showGiga("main")
+          .then(() => {
+            // বিজ্ঞাপন সফলভাবে দেখা হয়েছে
+            if (tg) {
+              tg.sendData(JSON.stringify({ action: 'ads_reward' }));
+            }
+            alert("Reward unlocked! 🎉");
+          })
+          .catch(e => {
+            console.error("GigaPub error:", e);
+            alert("বিজ্ঞাপন লোড হয়নি। পরে আবার চেষ্টা করুন।");
+          });
       } else {
-        alert("বিজ্ঞাপন বাটন ক্লিক হয়েছে (ডেমো মোড)");
+        // GigaPub SDK না থাকলে fallback
+        if (tg) {
+          tg.sendData(JSON.stringify({ action: 'show_ads' }));
+          tg.HapticFeedback.notificationOccurred('success');
+        } else {
+          alert("বিজ্ঞাপন বাটন ক্লিক হয়েছে (ডেমো মোড)");
+        }
       }
     });
 
