@@ -1,117 +1,135 @@
-<!DOCTYPE html>
-<html lang="bn">
+<!doctype html>
+
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>💎 Glow Cash</title>
-
-  <!-- Telegram Web App JS -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- GigaPub Ads -->
-  <script src="https://ad.gigapub.tech/script?id=1731"></script>
-
+  <title>Telegram Mini App • Tap Counter</title>
   <style>
-    :root {
-      --bg1: #0f172a;
-      --bg2: #1e293b;
-      --card: rgba(255, 255, 255, 0.05);
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --accent2: #a78bfa;
+    :root{
+      --bg:#0f1115; --card:#161a22; --text:#e7eaf3; --muted:#9aa4bc; --accent:#4c8bf5;
     }
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      height: 100%;
-      font-family: sans-serif;
-      color: var(--text);
-      background: radial-gradient(circle at top left, var(--bg1), var(--bg2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-    .card {
-      background: var(--card);
-      border-radius: 20px;
-      padding: 20px;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent2);
-    }
-    h1 {
-      font-size: 2rem;
-      margin: 0 0 10px;
-      text-shadow: 0 0 8px var(--accent), 0 0 12px var(--accent2);
-    }
-    p {
-      margin: 0 0 15px;
-      color: var(--muted);
-    }
-    button {
-      width: 100%;
-      padding: 14px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #0f172a;
-      box-shadow: 0 0 10px var(--accent), 0 0 20px var(--accent2);
-      transition: transform 0.2s ease;
-    }
-    button:hover {
-      transform: scale(1.03);
-    }
-    .ad-slot {
-      margin-top: 20px;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      font-size: 14px;
-      color: var(--muted);
-    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{background:var(--bg);color:var(--text);font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, "Apple Color Emoji","Segoe UI Emoji"; display:grid; place-items:center;}
+    .card{width:min(440px,92vw); background:var(--card); border-radius:20px; padding:24px; box-shadow:0 8px 32px rgba(0,0,0,.35);}
+    h1{margin:0 0 6px;font-size:22px}
+    p{margin:0 0 16px;color:var(--muted)}
+    .meter{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 18px}
+    .count{font-variant-numeric:tabular-nums; font-size:42px; font-weight:700}
+    .btn{appearance:none;border:0;border-radius:16px;padding:16px 18px; font-size:18px; font-weight:700; cursor:pointer; width:100%; background:var(--accent); color:white; transition:transform .03s ease;}
+    .btn:active{transform:scale(.98)}
+    .row{display:flex; gap:10px}
+    .ghost{background:transparent; border:1.5px solid #2a3244; color:var(--text)}
+    .kicker{font-size:12px; color:var(--muted); margin-top:10px}
+    .warn{color:#ffd166}
+    .ok{color:#9ae6b4}
+    code{background:#0c0f14;border:1px solid #222836;border-radius:8px;padding:2px 6px}
   </style>
 </head>
 <body>
-
   <div class="card">
-    <h1>💎 Glow Cash</h1>
-    <p>দেখো বিজ্ঞাপন, আয় করো!</p>
+    <h1>Tap Counter</h1>
+    <p>Example Telegram Mini App using <code>Telegram.WebApp</code>. Manual taps only.</p><div class="meter">
+  <div class="kicker">Total</div>
+  <div class="count" id="count">0</div>
+</div>
 
-    <button id="btnAd">📺 বিজ্ঞাপন দেখুন</button>
-    <button id="btnDev">👨‍💻 ডেভেলপার</button>
+<button id="tapBtn" class="btn">Tap</button>
 
-    <div id="adSlot" class="ad-slot">
-      এখানে ব্যানার বিজ্ঞাপন আসবে
-    </div>
-  </div>
+<div class="row" style="margin-top:10px">
+  <button id="resetBtn" class="btn ghost">Reset</button>
+  <button id="themeBtn" class="btn ghost">Toggle Theme</button>
+</div>
 
-  <script>
-    // বিজ্ঞাপন দেখার বাটন
-    document.getElementById('btnAd').onclick = async () => {
-      try {
-        if (window.gigaPub) {
-          await gigaPub.loadInterstitial();
-          gigaPub.showInterstitial();
-        } else {
-          alert('Ad script not loaded yet.');
-        }
-      } catch (e) {
-        alert('Ad failed to load.');
+<p class="kicker" id="status">Loading Telegram context…</p>
+<p class="kicker warn">⚠️ Auto‑clicking/automation can violate app rules & Telegram/TOS. This demo intentionally disables any programmatic tapping inside Telegram.</p>
+
+  </div>  <script>
+    // Detect Telegram Mini App environment
+    const tg = window.Telegram ? window.Telegram.WebApp : null;
+    const statusEl = document.getElementById('status');
+    const countEl = document.getElementById('count');
+    const tapBtn = document.getElementById('tapBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const themeBtn = document.getElementById('themeBtn');
+
+    let count = 0;
+
+    function render(){
+      countEl.textContent = count.toString();
+      if (tg) {
+        tg.MainButton.setText(`Save (${count})`);
+        tg.MainButton.show();
       }
-    };
+    }
 
-    // ডেভেলপার বাটন
-    document.getElementById('btnDev').onclick = () => {
-      window.open('https://t.me/GlowCashDev', '_blank');
-    };
-  </script>
+    // Manual tapping only
+    tapBtn.addEventListener('click', () => {
+      count++;
+      render();
+    });
 
-</body>
+    resetBtn.addEventListener('click', () => {
+      count = 0; render();
+    });
+
+    themeBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('light');
+      // Simple theme toggle (not using Telegram theme params here to keep it portable)
+      const light = document.documentElement.classList.contains('light');
+      document.documentElement.style.setProperty('--bg', light ? '#f7f8fb' : '#0f1115');
+      document.documentElement.style.setProperty('--card', light ? '#ffffff' : '#161a22');
+      document.documentElement.style.setProperty('--text', light ? '#0f1115' : '#e7eaf3');
+      document.documentElement.style.setProperty('--muted', light ? '#5a647a' : '#9aa4bc');
+    });
+
+    // Telegram integration (safe)
+    if (tg) {
+      try {
+        tg.expand();
+        tg.ready();
+        statusEl.textContent = 'Running inside Telegram Mini App.';
+
+        // Example: handling Main Button press
+        tg.onEvent('mainButtonClicked', () => {
+          tg.HapticFeedback.impactOccurred('light');
+          tg.close(); // or sendData to the bot
+        });
+      } catch (e) {
+        statusEl.textContent = 'Telegram context detected, but init failed.';
+        console.error(e);
+      }
+    } else {
+      statusEl.textContent = 'Not in Telegram — running in a normal browser.';
+    }
+
+    // --------------
+    // Dev-only helper (outside Telegram):
+    // Controlled programmatic click for QA at a low rate, ONLY when not in Telegram
+    // and only if URL has ?qa=1, and after a user gesture (Start QA).
+    // This is blocked inside Telegram to respect app rules.
+    // --------------
+    (function addQaHelper(){
+      if (tg) return; // never enable in Telegram
+      const params = new URLSearchParams(location.search);
+      if (!params.has('qa')) return;
+      const qaBtn = document.createElement('button');
+      qaBtn.textContent = 'Start QA (slow auto-tap)';
+      qaBtn.className = 'btn ghost';
+      qaBtn.style.marginTop = '10px';
+      document.querySelector('.card').appendChild(qaBtn);
+      let qaInterval = null;
+      qaBtn.addEventListener('click', () => {
+        if (qaInterval) { clearInterval(qaInterval); qaInterval = null; qaBtn.textContent = 'Start QA (slow auto-tap)'; return; }
+        qaBtn.textContent = 'Stop QA';
+        qaInterval = setInterval(() => {
+          // Simulate a *single* safe click every 1s for QA outside Telegram
+          tapBtn.click();
+        }, 1000);
+      });
+    })();
+
+    render();
+  </script></body>
 </html>
