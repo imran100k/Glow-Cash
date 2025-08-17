@@ -15,7 +15,7 @@
     .card{width:min(440px,92vw); background:var(--card); border-radius:20px; padding:24px; box-shadow:0 8px 32px rgba(0,0,0,.35);}
     h1{margin:0 0 6px;font-size:22px}
     p{margin:0 0 16px;color:var(--muted)}
-    .meter{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 18px}
+    .meter{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 4px}
     .count{font-variant-numeric:tabular-nums; font-size:48px; font-weight:700; text-shadow:0 0 12px rgba(76,139,245,0.6); transition: all 0.3s ease;}
     .count.glow{
       animation:pulse 1s ease-in-out 3;
@@ -25,6 +25,7 @@
       50%{text-shadow:0 0 28px rgba(76,139,245,1)}
       100%{text-shadow:0 0 12px rgba(76,139,245,0.6)}
     }
+    .ads-counter{font-size:16px; font-weight:600; color:var(--muted); margin-bottom:18px;}
     .btn{appearance:none;border:0;border-radius:16px;padding:16px 18px; font-size:18px; font-weight:700; cursor:pointer; width:100%; background:var(--accent); color:white; transition:transform .03s ease;}
     .btn:active{transform:scale(.98)}
     .row{display:flex; gap:10px}
@@ -40,9 +41,10 @@
   <div class="card">
     <h1>Reward Counter</h1>
     <p>Tap removed. Earn rewards by watching ads.</p><div class="meter">
-  <div class="kicker">Total</div>
+  <div class="kicker">Total Points</div>
   <div class="count" id="count">0</div>
 </div>
+<div class="ads-counter" id="adsCount">Ads Watched: 0</div>
 
 <div class="row" style="margin-top:10px">
   <button id="resetBtn" class="btn ghost">Reset</button>
@@ -61,14 +63,17 @@
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     const statusEl = document.getElementById('status');
     const countEl = document.getElementById('count');
+    const adsCountEl = document.getElementById('adsCount');
     const resetBtn = document.getElementById('resetBtn');
     const themeBtn = document.getElementById('themeBtn');
     const adsBtn = document.getElementById('adsBtn');
 
     let count = 0;
+    let adsCount = 0;
 
     function render(){
       countEl.textContent = count.toString();
+      adsCountEl.textContent = `Ads Watched: ${adsCount}`;
       if (tg) {
         tg.MainButton.setText(`Save (${count})`);
         tg.MainButton.show();
@@ -81,7 +86,7 @@
     }
 
     resetBtn.addEventListener('click', () => {
-      count = 0; render();
+      count = 0; adsCount = 0; render();
     });
 
     themeBtn.addEventListener('click', () => {
@@ -99,13 +104,14 @@
         window.showGiga("main")
           .then(() => {
             count += 10; // reward +10
+            adsCount += 1; // বিজ্ঞাপন কাউন্টার +1
             render();
             glow(); // glow effect after reward
 
             if (tg) {
-              tg.sendData(JSON.stringify({ action: 'ads_reward', reward: 10, total: count }));
+              tg.sendData(JSON.stringify({ action: 'ads_reward', reward: 10, total: count, adsWatched: adsCount }));
             }
-            alert("Reward unlocked! 🎉 +10 পয়েন্ট যোগ হয়েছে।");
+            alert(`Reward unlocked! 🎉 +10 পয়েন্ট যোগ হয়েছে। Ads watched: ${adsCount}`);
           })
           .catch(e => {
             console.error("GigaPub error:", e);
