@@ -1,402 +1,139 @@
-<!doctype html>
-
-<html lang="bn">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TMA • User & Admin (GigaPub Rewards)</title>
-  <style>
-    :root{
-      --bg:#0f1115; --card:#161a22; --text:#e7eaf3; --muted:#9aa4bc; --accent:#4c8bf5; --ok:#10b981; --warn:#f59e0b; --danger:#ef4444;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0}
-    body{background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,Noto Sans; display:grid; place-items:center;}
-    .wrap{width:min(980px,96vw);display:grid;gap:14px}
-    .tabs{display:flex;gap:8px;justify-content:flex-start}
-    .tab{border:1.5px solid #2a3244;border-radius:999px;padding:10px 14px;cursor:pointer;color:var(--muted)}
-    .tab.active{background:var(--accent);border-color:var(--accent);color:#fff}.card{background:var(--card); border-radius:20px; padding:18px; box-shadow:0 8px 32px rgba(0,0,0,.35)}
-h1{margin:0 0 6px;font-size:22px}
-p{margin:0 0 10px;color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
-.col-12{grid-column:span 12}
-.col-6{grid-column:span 6}
-.col-4{grid-column:span 4}
-.col-3{grid-column:span 3}
-@media(max-width:760px){.col-6,.col-4,.col-3{grid-column:span 12}}
-
-.kpi{display:flex;align-items:center;justify-content:space-between}
-.kpi .label{color:var(--muted);font-size:12px}
-.kpi .value{font-variant-numeric:tabular-nums;font-size:34px;font-weight:800;text-shadow:0 0 12px rgba(76,139,245,.6)}
-.value.glow{animation:pulse 1s ease-in-out 3}
-@keyframes pulse{0%{text-shadow:0 0 12px rgba(76,139,245,.6)}50%{text-shadow:0 0 28px rgba(76,139,245,1)}100%{text-shadow:0 0 12px rgba(76,139,245,.6)}}
-
-.btn{appearance:none;border:0;border-radius:14px;padding:12px 14px;font-size:15px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff}
-.btn:disabled{opacity:.6;cursor:not-allowed}
-.ghost{background:transparent;border:1.5px solid #2a3244;color:var(--text)}
-.danger{background:var(--danger)}
-.warn{background:var(--warn)}
-
-label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
-select,input[type=range],input[type=number],input[type=text]{width:100%;background:#0c0f14;border:1px solid #222836;color:var(--text);border-radius:12px;padding:10px}
-input[type=range]{height:36px}
-.badge{display:inline-block;margin-left:6px;font-size:12px;background:#0c0f14;border:1px solid #2a3244;color:#cde; padding:2px 8px;border-radius:999px}
-table{width:100%;border-collapse:separate;border-spacing:0 8px}
-th,td{font-size:13px;padding:8px 10px}
-tbody tr{background:#0c0f14;border:1px solid #222836}
-th{color:#9aa4bc;text-align:left}
-.muted{color:var(--muted)}
-.pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#0c0f14;border:1px solid #2a3244;font-size:12px}
-
-  </style>
-  <!-- GigaPub SDK (replace id as needed) -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://ad.gigapub.tech/script?id=1731"></script>
+  <style>
+    .active { color: #4f46e5; font-weight: 600; }
+  </style>
 </head>
-<body>
-  <div class="wrap">
-    <div class="tabs">
-      <button class="tab active" id="tabUser">User App</button>
-      <button class="tab" id="tabAdmin">Admin App</button>
-    </div><!-- USER APP -->
-<section class="card" id="viewUser">
-  <h1>User • Rewards</h1>
-  <p id="status" class="muted">Loading Telegram context…</p>
+<body class="bg-gray-100 text-gray-800">
+  <!-- Header -->
+  <header class="bg-white shadow p-4 flex items-center space-x-3">
+    <img src="https://ui-avatars.com/api/?name=User&background=random" class="w-12 h-12 rounded-full">
+    <div>
+      <h2 id="userName" class="font-bold text-lg">Md Hossain Ali</h2>
+      <p id="userBalance" class="text-sm text-gray-600">BD 0.10</p>
+    </div>
+  </header>
 
-  <div class="grid">
-    <div class="col-4 card">
-      <div class="kpi">
-        <div class="label">Total Points</div>
-        <div id="kpiPoints" class="value">0</div>
+  <!-- Sections -->
+  <main class="p-4">
+    <!-- Home -->
+    <section id="homeSection">
+      <div class="bg-indigo-500 text-white p-4 rounded-xl mb-4">
+        <h2 class="font-semibold">Welcome, <span id="welcomeName">Md Hossain Ali</span>!</h2>
+        <p class="text-sm">Ready to boost your earnings?</p>
+        <button onclick="showSection('earnSection')" class="mt-3 bg-white text-indigo-600 px-4 py-2 rounded-lg">Start Earning Now 🚀</button>
       </div>
-    </div>
-    <div class="col-4 card">
-      <div class="kpi">
-        <div class="label">Ads Watched</div>
-        <div id="kpiAds" class="value">0</div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white rounded-xl p-4 text-center shadow">
+          <p class="text-lg font-bold" id="earnings">BD 0.10</p>
+          <p class="text-sm text-gray-600">Total Earnings</p>
+        </div>
+        <div class="bg-white rounded-xl p-4 text-center shadow">
+          <p class="text-lg font-bold" id="adsWatched">1</p>
+          <p class="text-sm text-gray-600">Ads Watched</p>
+        </div>
+        <div class="bg-white rounded-xl p-4 text-center shadow col-span-2">
+          <p class="text-lg font-bold" id="referrals">0</p>
+          <p class="text-sm text-gray-600">Your Referrals</p>
+        </div>
       </div>
-    </div>
-    <div class="col-4 card">
-      <div class="kpi">
-        <div class="label">Cooldown</div>
-        <div id="kpiCooldown" class="value">0s</div>
+    </section>
+
+    <!-- Earn -->
+    <section id="earnSection" class="hidden">
+      <h2 class="text-xl font-bold mb-3">Earn</h2>
+      <button onclick="watchAd()" class="bg-indigo-500 text-white px-4 py-2 rounded-lg shadow">📢 Watch Ad</button>
+      <p id="rewardMsg" class="mt-3 text-green-600"></p>
+    </section>
+
+    <!-- Refer -->
+    <section id="referSection" class="hidden">
+      <h2 class="text-xl font-bold mb-3">Refer</h2>
+      <p>Your referral link:</p>
+      <div class="flex mt-2">
+        <input id="refLink" class="flex-1 border p-2 rounded-l" value="https://t.me/yourbot?start=ref123" readonly>
+        <button onclick="copyRef()" class="bg-indigo-500 text-white px-3 rounded-r">Copy</button>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <div class="grid" style="margin-top:10px">
-    <div class="col-12 card">
-      <button id="adsBtn" class="btn warn">📢 বিজ্ঞাপন দেখুন</button>
-      <span class="badge" id="rewardInfo">Reward: 10 pts</span>
-      <span class="badge" id="geoInfo">GEO: BD</span>
-      <span class="badge" id="formatInfo">Format: Rewarded</span>
-      <p class="muted" style="margin-top:8px">⚠️ Auto‑clicking নিষিদ্ধ। ইউজার‑initiated action দিয়েই বিজ্ঞাপন চালান।</p>
-    </div>
-  </div>
-</section>
+    <!-- Withdraw -->
+    <section id="withdrawSection" class="hidden">
+      <h2 class="text-xl font-bold mb-3">Withdraw</h2>
+      <form class="space-y-3">
+        <input type="number" placeholder="Amount" class="w-full border p-2 rounded">
+        <select class="w-full border p-2 rounded">
+          <option>bkash</option>
+          <option>Nagad</option>
+          <option>Rocket</option>
+        </select>
+        <button type="button" onclick="alert('Withdraw request sent!')" class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Submit</button>
+      </form>
+    </section>
 
-<!-- ADMIN APP -->
-<section class="card" id="viewAdmin" style="display:none">
-  <h1>Admin • Controls</h1>
-  <p class="muted">Demo admin — client‑side only. PIN protects casual access.</p>
+    <!-- History -->
+    <section id="historySection" class="hidden">
+      <h2 class="text-xl font-bold mb-3">History</h2>
+      <ul id="historyList" class="space-y-2">
+        <li class="bg-white p-3 rounded shadow">Watched Ad - Earned BD 0.10</li>
+      </ul>
+    </section>
 
-  <div class="grid">
-    <div class="col-3 card">
-      <div class="kpi"><div class="label">Points</div><div id="aPoints" class="value">0</div></div>
-    </div>
-    <div class="col-3 card">
-      <div class="kpi"><div class="label">Ads</div><div id="aAds" class="value">0</div></div>
-    </div>
-    <div class="col-3 card">
-      <div class="kpi"><div class="label">Reward/Ad</div><div id="aReward" class="value">10</div></div>
-    </div>
-    <div class="col-3 card">
-      <div class="kpi"><div class="label">Cooldown</div><div id="aCooldown" class="value">60s</div></div>
-    </div>
-  </div>
+    <!-- Profile -->
+    <section id="profileSection" class="hidden">
+      <h2 class="text-xl font-bold mb-3">Profile</h2>
+      <p>Name: <span id="profileName">Md Hossain Ali</span></p>
+      <p>Balance: <span id="profileBalance">BD 0.10</span></p>
+    </section>
+  </main>
 
-  <div class="grid" style="margin-top:8px">
-    <div class="col-6">
-      <label>Target GEO</label>
-      <select id="geo"><option>US</option><option>GB</option><option>DE</option><option>CA</option><option>AU</option><option>BR</option><option>ID</option><option>PH</option><option>IN</option><option selected>BD</option><option>PK</option><option>GLOBAL</option></select>
-    </div>
-    <div class="col-6">
-      <label>Ad Format</label>
-      <select id="format"><option selected>rewarded</option><option>interstitial</option><option>banner</option></select>
-    </div>
-    <div class="col-6">
-      <label>Reward per Ad (points)</label>
-      <input id="reward" type="number" min="1" max="1000" value="10" />
-    </div>
-    <div class="col-6">
-      <label>Frequency Cap (ads / minute)
-        <span class="badge">1–6</span>
-      </label>
-      <input id="freq" type="number" min="1" max="6" value="1" />
-      <p class="muted">Cooldown = <span id="coolText">60</span>s (auto)</p>
-    </div>
-    <div class="col-6">
-      <label>Completion Rate (for analytics note)</label>
-      <input id="completion" type="number" min="30" max="100" value="90" />
-    </div>
-    <div class="col-6">
-      <label>Session Length (min) — note</label>
-      <input id="session" type="number" min="1" max="60" value="5" />
-    </div>
-    <div class="col-6">
-      <label>Admin PIN (set/change)</label>
-      <input id="pinInput" type="text" placeholder="e.g. 2468" />
-    </div>
-    <div class="col-6" style="display:flex;gap:8px;align-items:flex-end">
-      <button id="savePin" class="btn ghost">Save PIN</button>
-      <span class="badge">Default PIN: 1234</span>
-    </div>
-  </div>
+  <!-- Bottom Nav -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2">
+    <button onclick="showSection('homeSection')" id="homeBtn" class="active">Home</button>
+    <button onclick="showSection('earnSection')" id="earnBtn">Earn</button>
+    <button onclick="showSection('referSection')" id="referBtn">Refer</button>
+    <button onclick="showSection('withdrawSection')" id="withdrawBtn">Withdraw</button>
+    <button onclick="showSection('historySection')" id="historyBtn">History</button>
+    <button onclick="showSection('profileSection')" id="profileBtn">Profile</button>
+  </nav>
 
-  <div class="grid" style="margin-top:8px">
-    <div class="col-12" style="display:flex;gap:8px;flex-wrap:wrap">
-      <button id="exportBtn" class="btn ghost">Export Logs (CSV)</button>
-      <button id="resetCounters" class="btn danger">Reset Counters</button>
-      <button id="toggleMaint" class="btn">Toggle Maintenance</button>
-      <span id="maintBadge" class="pill">Maintenance: OFF</span>
-    </div>
-  </div>
-
-  <div class="card" style="margin-top:10px">
-    <h3 style="margin:0 0 8px">Recent Events</h3>
-    <table>
-      <thead><tr><th>Time</th><th>Action</th><th>Reward</th><th>Points</th><th>Ads</th><th>GEO</th><th>Fmt</th></tr></thead>
-      <tbody id="logBody"></tbody>
-    </table>
-  </div>
-</section>
-
-  </div>  <script>
-    // —— Telegram Context ——
-    const tg = window.Telegram ? window.Telegram.WebApp : null;
-
-    // —— Elements (User) ——
-    const tabUser = document.getElementById('tabUser');
-    const tabAdmin = document.getElementById('tabAdmin');
-    const viewUser = document.getElementById('viewUser');
-    const viewAdmin = document.getElementById('viewAdmin');
-
-    const kpiPoints = document.getElementById('kpiPoints');
-    const kpiAds = document.getElementById('kpiAds');
-    const kpiCooldown = document.getElementById('kpiCooldown');
-    const rewardInfo = document.getElementById('rewardInfo');
-    const geoInfo = document.getElementById('geoInfo');
-    const formatInfo = document.getElementById('formatInfo');
-
-    const adsBtn = document.getElementById('adsBtn');
-    const statusEl = document.getElementById('status');
-
-    // —— Elements (Admin) ——
-    const aPoints = document.getElementById('aPoints');
-    const aAds = document.getElementById('aAds');
-    const aReward = document.getElementById('aReward');
-    const aCooldown = document.getElementById('aCooldown');
-
-    const geoSel = document.querySelector('#viewAdmin #geo');
-    const fmtSel = document.querySelector('#viewAdmin #format');
-    const rewardInput = document.getElementById('reward');
-    const freqInput = document.getElementById('freq');
-    const coolText = document.getElementById('coolText');
-    const completionInput = document.getElementById('completion');
-    const sessionInput = document.getElementById('session');
-
-    const pinInput = document.getElementById('pinInput');
-    const savePinBtn = document.getElementById('savePin');
-
-    const exportBtn = document.getElementById('exportBtn');
-    const resetCountersBtn = document.getElementById('resetCounters');
-    const toggleMaintBtn = document.getElementById('toggleMaint');
-    const maintBadge = document.getElementById('maintBadge');
-
-    const logBody = document.getElementById('logBody');
-
-    // —— Local Storage Helpers ——
-    const LS = {
-      get(k, d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d } catch{ return d } },
-      set(k, v){ localStorage.setItem(k, JSON.stringify(v)) }
-    };
-
-    // —— State ——
-    const state = LS.get('tma_state', {
-      points: 0,
-      adsWatched: 0,
-      settings: {
-        geo: 'BD', format: 'rewarded', reward: 10, freq: 1, completion: 90, session: 5,
-        maintenance: false,
-        pin: '1234'
-      },
-      logs: []
-    });
-
-    function save(){ LS.set('tma_state', state); }
-
-    // —— UI Sync ——
-    function fmtSec(s){ return Math.max(0, Math.ceil(s)) + 's'; }
-    function cooldownSec(){ return Math.round(60 / Math.max(1, Number(state.settings.freq))); }
-
-    function syncUser(){
-      kpiPoints.textContent = state.points;
-      kpiAds.textContent = state.adsWatched;
-      kpiCooldown.textContent = fmtSec(cooldownSec());
-      rewardInfo.textContent = `Reward: ${state.settings.reward} pts`;
-      geoInfo.textContent = `GEO: ${state.settings.geo}`;
-      formatInfo.textContent = `Format: ${state.settings.format}`;
-
-      adsBtn.disabled = !!state.settings.maintenance;
-      maintBadge.textContent = `Maintenance: ${state.settings.maintenance ? 'ON' : 'OFF'}`;
-      if (tg){
-        tg.MainButton.setText(`Save (${state.points})`);
-        tg.MainButton.show();
-      }
+  <script>
+    function showSection(id) {
+      document.querySelectorAll("main section").forEach(s => s.classList.add("hidden"));
+      document.getElementById(id).classList.remove("hidden");
+      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+      document.querySelector(`[onclick="showSection('${id}')"]`).classList.add("active");
     }
 
-    function syncAdmin(){
-      aPoints.textContent = state.points;
-      aAds.textContent = state.adsWatched;
-      aReward.textContent = state.settings.reward;
-      aCooldown.textContent = fmtSec(cooldownSec());
-
-      geoSel.value = state.settings.geo;
-      fmtSel.value = state.settings.format;
-      rewardInput.value = state.settings.reward;
-      freqInput.value = state.settings.freq;
-      coolText.textContent = cooldownSec();
-      completionInput.value = state.settings.completion;
-      sessionInput.value = state.settings.session;
-
-      // Logs
-      logBody.innerHTML = state.logs.slice(-20).reverse().map(l=>
-        `<tr><td>${new Date(l.t).toLocaleTimeString()}</td><td>${l.a}</td><td>${l.r}</td><td>${l.p}</td><td>${l.aw}</td><td>${l.geo}</td><td>${l.fmt}</td></tr>`
-      ).join('');
+    function watchAd() {
+      window.showGiga("main")
+        .then(() => {
+          let bal = parseFloat(document.getElementById("earnings").innerText.replace("BD ",""));
+          bal += 0.10;
+          document.getElementById("earnings").innerText = "BD " + bal.toFixed(2);
+          document.getElementById("userBalance").innerText = "BD " + bal.toFixed(2);
+          document.getElementById("profileBalance").innerText = "BD " + bal.toFixed(2);
+          let ads = parseInt(document.getElementById("adsWatched").innerText) + 1;
+          document.getElementById("adsWatched").innerText = ads;
+          document.getElementById("rewardMsg").innerText = "✅ Ad watched! Earned BD 0.10";
+          document.getElementById("historyList").innerHTML += `<li class="bg-white p-3 rounded shadow">Watched Ad - Earned BD 0.10</li>`;
+        })
+        .catch(e => {
+          document.getElementById("rewardMsg").innerText = "❌ Ad failed: " + e.message;
+        });
     }
 
-    function glow(el){ el.classList.add('glow'); setTimeout(()=> el.classList.remove('glow'), 1200); }
-
-    function log(action, reward){
-      state.logs.push({ t: Date.now(), a: action, r: reward, p: state.points, aw: state.adsWatched, geo: state.settings.geo, fmt: state.settings.format });
-      if (state.logs.length > 500) state.logs.splice(0, state.logs.length - 500);
-      save();
-      syncAdmin();
+    function copyRef() {
+      let link = document.getElementById("refLink");
+      link.select();
+      navigator.clipboard.writeText(link.value);
+      alert("Referral link copied!");
     }
-
-    // —— Tabs & Admin PIN ——
-    function showUser(){ viewUser.style.display='block'; viewAdmin.style.display='none'; tabUser.classList.add('active'); tabAdmin.classList.remove('active'); }
-    function showAdmin(){
-      const qp = new URLSearchParams(location.search);
-      const bypass = qp.get('admin') === '1';
-      if (!bypass){
-        const pin = prompt('Enter Admin PIN');
-        if (pin !== state.settings.pin){ alert('Wrong PIN'); return; }
-      }
-      viewUser.style.display='none'; viewAdmin.style.display='block'; tabUser.classList.remove('active'); tabAdmin.classList.add('active');
-      syncAdmin();
-    }
-    tabUser.addEventListener('click', showUser);
-    tabAdmin.addEventListener('click', showAdmin);
-
-    savePinBtn.addEventListener('click', ()=>{
-      const v = pinInput.value.trim();
-      if (!v) return alert('PIN cannot be empty');
-      state.settings.pin = v; save(); alert('PIN updated'); pinInput.value='';
-    });
-
-    // —— Admin Controls ——
-    function settingsChanged(){
-      state.settings.geo = geoSel.value;
-      state.settings.format = fmtSel.value;
-      state.settings.reward = Math.max(1, Number(rewardInput.value||10));
-      state.settings.freq = Math.max(1, Math.min(6, Number(freqInput.value||1)));
-      state.settings.completion = Math.max(30, Math.min(100, Number(completionInput.value||90)));
-      state.settings.session = Math.max(1, Math.min(60, Number(sessionInput.value||5)));
-      save();
-      coolText.textContent = cooldownSec();
-      syncUser();
-      syncAdmin();
-      log('settings_update', 0);
-    }
-    [geoSel, fmtSel, rewardInput, freqInput, completionInput, sessionInput].forEach(el=>{
-      el.addEventListener('input', settingsChanged);
-      el.addEventListener('change', settingsChanged);
-    });
-
-    resetCountersBtn.addEventListener('click', ()=>{
-      if (!confirm('Reset points and ads watched?')) return;
-      state.points = 0; state.adsWatched = 0; save(); syncUser(); syncAdmin(); log('reset', 0);
-    });
-
-    toggleMaintBtn.addEventListener('click', ()=>{
-      state.settings.maintenance = !state.settings.maintenance; save(); syncUser(); syncAdmin();
-      log(state.settings.maintenance ? 'maintenance_on' : 'maintenance_off', 0);
-    });
-
-    exportBtn.addEventListener('click', ()=>{
-      const rows = [['time','action','reward','points','adsWatched','geo','format']]
-        .concat(state.logs.map(l=>[new Date(l.t).toISOString(), l.a, l.r, l.p, l.aw, l.geo, l.fmt]));
-      const csv = rows.map(r=>r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(',')).join('\n');
-      const blob = new Blob([csv], {type:'text/csv'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'tma_logs.csv';
-      a.click();
-    });
-
-    // —— Cooldown Enforce on User Button ——
-    let lastAdTime = 0; // ms
-    function canShow(){
-      const cd = cooldownSec();
-      const left = cd - ((Date.now() - lastAdTime)/1000);
-      return left <= 0;
-    }
-    function updateCooldownTicker(){
-      const cd = cooldownSec();
-      const left = Math.max(0, cd - ((Date.now() - lastAdTime)/1000));
-      kpiCooldown.textContent = fmtSec(left);
-      adsBtn.disabled = state.settings.maintenance || left>0;
-      requestAnimationFrame(updateCooldownTicker);
-    }
-
-    adsBtn.addEventListener('click', ()=>{
-      if (!canShow()) return;
-      const rw = Number(state.settings.reward);
-      const callAd = () => {
-        lastAdTime = Date.now();
-        if (typeof window.showGiga === 'function'){
-          window.showGiga('main')
-            .then(()=>{ afterAd(true); })
-            .catch(e=>{ console.error('GigaPub error:', e); alert('বিজ্ঞাপন লোড হয়নি। পরে আবার চেষ্টা করুন।'); afterAd(false); });
-        } else {
-          alert('বিজ্ঞাপন বাটন ক্লিক হয়েছে (ডেমো মোড)');
-          afterAd(true);
-        }
-      };
-      function afterAd(success){
-        if (!success) return;
-        state.points += rw; state.adsWatched += 1; save();
-        syncUser(); syncAdmin();
-        glow(kpiPoints); glow(kpiAds);
-        log('ads_reward', rw);
-        if (tg) tg.sendData(JSON.stringify({ action:'ads_reward', reward: rw, total: state.points, adsWatched: state.adsWatched }));
-        alert(`Reward unlocked! +${rw} points`);
-      }
-      callAd();
-    });
-
-    // —— Telegram ready ——
-    if (tg){
-      try{ tg.expand(); tg.ready(); statusEl.textContent = 'Running inside Telegram Mini App.'; }
-      catch(e){ statusEl.textContent = 'Telegram detected, but init failed.'; }
-      tg.onEvent?.('mainButtonClicked', ()=> tg.close());
-    } else {
-      statusEl.textContent = 'Not in Telegram — running in a normal browser.';
-    }
-
-    // —— Init ——
-    syncUser();
-    syncAdmin();
-    updateCooldownTicker();
-  </script></body>
+  </script>
+</body>
 </html>
