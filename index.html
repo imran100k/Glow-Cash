@@ -40,14 +40,13 @@
 <body>
   <div class="card">
     <h1>Reward Counter</h1>
-    <p>Tap removed. Earn rewards by watching ads.</p><div class="meter">
+    <p>Earn rewards by watching ads.</p><div class="meter">
   <div class="kicker">Total Points</div>
   <div class="count" id="count">0</div>
 </div>
 <div class="ads-counter" id="adsCount">Ads Watched: 0</div>
 
 <div class="row" style="margin-top:10px">
-  <button id="resetBtn" class="btn ghost">Reset</button>
   <button id="themeBtn" class="btn ghost">Toggle Theme</button>
 </div>
 
@@ -64,7 +63,6 @@
     const statusEl = document.getElementById('status');
     const countEl = document.getElementById('count');
     const adsCountEl = document.getElementById('adsCount');
-    const resetBtn = document.getElementById('resetBtn');
     const themeBtn = document.getElementById('themeBtn');
     const adsBtn = document.getElementById('adsBtn');
 
@@ -84,10 +82,6 @@
       countEl.classList.add('glow');
       setTimeout(()=> countEl.classList.remove('glow'), 3000);
     }
-
-    resetBtn.addEventListener('click', () => {
-      count = 0; adsCount = 0; render();
-    });
 
     themeBtn.addEventListener('click', () => {
       document.documentElement.classList.toggle('light');
