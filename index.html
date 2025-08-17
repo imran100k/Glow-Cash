@@ -1,144 +1,273 @@
 <!doctype html>
 
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Telegram Mini App • Reward Counter</title>
+  <title>TMA • CPM Optimizer + Rewards</title>
   <style>
     :root{
-      --bg:#0f1115; --card:#161a22; --text:#e7eaf3; --muted:#9aa4bc; --accent:#4c8bf5;
+      --bg:#0f1115; --card:#161a22; --text:#e7eaf3; --muted:#9aa4bc; --accent:#4c8bf5; --ok:#10b981; --warn:#f59e0b;
     }
     *{box-sizing:border-box}
     html,body{height:100%;margin:0}
-    body{background:var(--bg);color:var(--text);font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans; display:grid; place-items:center;}
-    .card{width:min(440px,92vw); background:var(--card); border-radius:20px; padding:24px; box-shadow:0 8px 32px rgba(0,0,0,.35);}
+    body{background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,Noto Sans; display:grid; place-items:center;}
+    .wrap{width:min(940px,94vw);display:grid;gap:14px}
+    .card{background:var(--card); border-radius:20px; padding:18px; box-shadow:0 8px 32px rgba(0,0,0,.35)}
     h1{margin:0 0 6px;font-size:22px}
-    p{margin:0 0 16px;color:var(--muted)}
-    .meter{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 4px}
-    .count{font-variant-numeric:tabular-nums; font-size:48px; font-weight:700; text-shadow:0 0 12px rgba(76,139,245,0.6); transition: all 0.3s ease;}
-    .count.glow{
-      animation:pulse 1s ease-in-out 3;
-    }
-    @keyframes pulse{
-      0%{text-shadow:0 0 12px rgba(76,139,245,0.6)}
-      50%{text-shadow:0 0 28px rgba(76,139,245,1)}
-      100%{text-shadow:0 0 12px rgba(76,139,245,0.6)}
-    }
-    .ads-counter{font-size:16px; font-weight:600; color:var(--muted); margin-bottom:18px;}
-    .btn{appearance:none;border:0;border-radius:16px;padding:16px 18px; font-size:18px; font-weight:700; cursor:pointer; width:100%; background:var(--accent); color:white; transition:transform .03s ease;}
-    .btn:active{transform:scale(.98)}
-    .row{display:flex; gap:10px}
-    .ghost{background:transparent; border:1.5px solid #2a3244; color:var(--text)}
-    .kicker{font-size:12px; color:var(--muted); margin-top:10px}
-    .warn{color:#ffd166}
-    code{background:#0c0f14;border:1px solid #222836;border-radius:8px;padding:2px 6px}
+    p{margin:0 0 10px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .col-12{grid-column:span 12}
+    .col-6{grid-column:span 6}
+    .col-4{grid-column:span 4}
+    @media(max-width:760px){.col-6{grid-column:span 12}.col-4{grid-column:span 12}}.kpi{display:flex;align-items:center;justify-content:space-between}
+.kpi .label{color:var(--muted);font-size:12px}
+.kpi .value{font-variant-numeric:tabular-nums;font-size:34px;font-weight:800;text-shadow:0 0 12px rgba(76,139,245,.6)}
+.value.glow{animation:pulse 1s ease-in-out 3}
+@keyframes pulse{0%{text-shadow:0 0 12px rgba(76,139,245,.6)}50%{text-shadow:0 0 28px rgba(76,139,245,1)}100%{text-shadow:0 0 12px rgba(76,139,245,.6)}}
+
+.btn{appearance:none;border:0;border-radius:14px;padding:14px 16px;font-size:16px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;width:100%}
+.btn:active{transform:scale(.98)}
+.ghost{background:transparent;border:1.5px solid #2a3244}
+
+.row{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
+.row .field{grid-column:span 6}
+@media(max-width:760px){.row .field{grid-column:span 12}}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+select,input[type=range],input[type=number]{width:100%;background:#0c0f14;border:1px solid #222836;color:var(--text);border-radius:12px;padding:10px}
+input[type=range]{height:36px}
+
+.tips{font-size:14px;color:var(--muted)}
+.tips li{margin:6px 0}
+.badge{display:inline-block;margin-left:6px;font-size:12px;background:#0c0f14;border:1px solid #2a3244;color:#cde; padding:2px 8px;border-radius:999px}
+
+.warn{color:var(--warn)}
+
   </style>
-  <!-- GigaPub SDK -->
+  <!-- GigaPub SDK (replace id as needed) -->
   <script src="https://ad.gigapub.tech/script?id=1731"></script>
 </head>
 <body>
-  <div class="card">
-    <h1>Reward Counter</h1>
-    <p>Earn rewards by watching ads.</p><div class="meter">
-  <div class="kicker">Total Points</div>
-  <div class="count" id="count">0</div>
+  <div class="wrap">
+    <div class="card col-12">
+      <h1>CPM Optimizer + Rewards</h1>
+      <p>Rewarded ads দিয়ে আয় বাড়ান। নিচের কন্ট্রোলগুলো দিয়ে আনুমানিক eCPM দেখুন, আর নিচের বাটন দিয়ে বিজ্ঞাপন চালান।</p>
+    </div><div class="grid">
+  <div class="card col-4">
+    <div class="kpi">
+      <div class="label">Total Points</div>
+      <div id="kpiPoints" class="value">0</div>
+    </div>
+  </div>
+  <div class="card col-4">
+    <div class="kpi">
+      <div class="label">Ads Watched</div>
+      <div id="kpiAds" class="value">0</div>
+    </div>
+  </div>
+  <div class="card col-4">
+    <div class="kpi">
+      <div class="label">Estimated eCPM (USD)</div>
+      <div id="kpiEcpm" class="value">0.00</div>
+    </div>
+  </div>
 </div>
-<div class="ads-counter" id="adsCount">Ads Watched: 0</div>
 
-<div class="row" style="margin-top:10px">
-  <button id="themeBtn" class="btn ghost">Toggle Theme</button>
+<div class="card col-12">
+  <div class="row">
+    <div class="field">
+      <label>Target GEO</label>
+      <select id="geo">
+        <option value="US">United States</option>
+        <option value="GB">United Kingdom</option>
+        <option value="DE">Germany</option>
+        <option value="CA">Canada</option>
+        <option value="AU">Australia</option>
+        <option value="BR">Brazil</option>
+        <option value="ID">Indonesia</option>
+        <option value="PH">Philippines</option>
+        <option value="IN">India</option>
+        <option value="BD" selected>Bangladesh</option>
+        <option value="PK">Pakistan</option>
+        <option value="GLOBAL">Global Mix</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Ad Format</label>
+      <select id="format">
+        <option value="rewarded" selected>Rewarded</option>
+        <option value="interstitial">Interstitial</option>
+        <option value="banner">Banner</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Completion Rate <span id="crLabel" class="badge">90%</span></label>
+      <input id="completion" type="range" min="30" max="100" value="90" />
+    </div>
+    <div class="field">
+      <label>Avg. Session Length (min) <span id="slLabel" class="badge">5</span></label>
+      <input id="session" type="range" min="1" max="20" value="5" />
+    </div>
+    <div class="field">
+      <label>Frequency Cap (ads/user/min) <span id="fcLabel" class="badge">1</span></label>
+      <input id="freq" type="range" min="1" max="6" value="1" />
+    </div>
+    <div class="field">
+      <label>Reward per Ad (points) <span id="rwLabel" class="badge">10</span></label>
+      <input id="reward" type="range" min="1" max="50" value="10" />
+    </div>
+  </div>
 </div>
 
-<!-- বিজ্ঞাপন বাটন -->
-<button id="adsBtn" class="btn" style="margin-top:12px;background:#f59e0b">
-  📢 বিজ্ঞাপন দেখুন
-</button>
-
-<p class="kicker" id="status">Loading Telegram context…</p>
-<p class="kicker warn">⚠️ Auto‑clicking/automation can violate app rules & Telegram/TOS. This demo intentionally disables any programmatic tapping inside Telegram.</p>
+<div class="grid">
+  <div class="card col-6">
+    <button id="adsBtn" class="btn" style="background:var(--warn)">📢 বিজ্ঞাপন দেখুন</button>
+    <p class="tips" id="status">Loading Telegram context…</p>
+    <p class="tips warn">⚠️ Auto‑clicking নিষিদ্ধ। ইউজার-initiated action দিয়েই বিজ্ঞাপন চালান।</p>
+  </div>
+  <div class="card col-6">
+    <p class="tips"><strong>Quick Tips</strong></p>
+    <ul class="tips" id="tipsList">
+      <li>Rewarded Ads সাধারণত eCPM সবচেয়ে বেশি দেয়।</li>
+      <li>High-value GEO (US/UK/DE/CA/AU) এ ফোকাস করলে eCPM বাড়ে।</li>
+      <li>Completion rate ↑ রাখতে রিওয়ার্ড/ইনসেনটিভ দিন।</li>
+      <li>Frequency cap 1–3 রেঞ্জে রাখুন; বেশি হলে ad fatigue দেখা দেয়।</li>
+    </ul>
+  </div>
+</div>
 
   </div>  <script>
+    // —— Telegram Context ——
     const tg = window.Telegram ? window.Telegram.WebApp : null;
-    const statusEl = document.getElementById('status');
-    const countEl = document.getElementById('count');
-    const adsCountEl = document.getElementById('adsCount');
-    const themeBtn = document.getElementById('themeBtn');
+
+    // —— Elements ——
+    const kpiPoints = document.getElementById('kpiPoints');
+    const kpiAds = document.getElementById('kpiAds');
+    const kpiEcpm = document.getElementById('kpiEcpm');
     const adsBtn = document.getElementById('adsBtn');
+    const statusEl = document.getElementById('status');
 
-    let count = 0;
-    let adsCount = 0;
+    const geo = document.getElementById('geo');
+    const format = document.getElementById('format');
+    const completion = document.getElementById('completion');
+    const session = document.getElementById('session');
+    const freq = document.getElementById('freq');
+    const reward = document.getElementById('reward');
 
-    function render(){
-      countEl.textContent = count.toString();
-      adsCountEl.textContent = `Ads Watched: ${adsCount}`;
-      if (tg) {
-        tg.MainButton.setText(`Save (${count})`);
+    const crLabel = document.getElementById('crLabel');
+    const slLabel = document.getElementById('slLabel');
+    const fcLabel = document.getElementById('fcLabel');
+    const rwLabel = document.getElementById('rwLabel');
+
+    // —— State ——
+    let points = 0;
+    let adsWatched = 0;
+
+    // Rough GEO base eCPM (USD) — demo only
+    const GEO_BASE = { US:10, GB:8, DE:7, CA:7, AU:7, BR:3, ID:2.5, PH:2.5, IN:2, BD:1.5, PK:1.5, GLOBAL:4 };
+    const FMT_MUL = { rewarded:1.6, interstitial:1.0, banner:0.3 };
+
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+    function estimateEcpm(){
+      const base = GEO_BASE[geo.value] || GEO_BASE.GLOBAL;
+      const fmt = FMT_MUL[format.value] || 1;
+      const cr = Number(completion.value); // 30..100
+      const sl = Number(session.value);    // 1..20 (min)
+      const fc = Number(freq.value);       // 1..6
+
+      // Completion multiplier: 30% => 0.5x ... 100% => 1.2x
+      const crMul = 0.5 + (cr - 30) * (0.7 / 70);
+      // Session length: 1min => 0.7x ... 20min => 1.3x
+      const slMul = 0.7 + (sl - 1) * (0.6 / 19);
+      // Frequency cap penalty after 3+/min
+      const fcMul = fc <= 3 ? 1 : clamp(1 - (fc - 3) * 0.15, 0.5, 1);
+
+      const ecpm = base * fmt * crMul * slMul * fcMul;
+      return ecpm.toFixed(2);
+    }
+
+    function updateKpis(){
+      kpiPoints.textContent = points.toString();
+      kpiAds.textContent = adsWatched.toString();
+      kpiEcpm.textContent = estimateEcpm();
+      if (tg){
+        tg.MainButton.setText(`Save (${points})`);
         tg.MainButton.show();
       }
     }
 
-    function glow(){
-      countEl.classList.add('glow');
-      setTimeout(()=> countEl.classList.remove('glow'), 3000);
+    function glow(el){
+      el.classList.add('glow');
+      setTimeout(()=> el.classList.remove('glow'), 1200);
     }
 
-    themeBtn.addEventListener('click', () => {
-      document.documentElement.classList.toggle('light');
-      const light = document.documentElement.classList.contains('light');
-      document.documentElement.style.setProperty('--bg', light ? '#f7f8fb' : '#0f1115');
-      document.documentElement.style.setProperty('--card', light ? '#ffffff' : '#161a22');
-      document.documentElement.style.setProperty('--text', light ? '#0f1115' : '#e7eaf3');
-      document.documentElement.style.setProperty('--muted', light ? '#5a647a' : '#9aa4bc');
-    });
+    // —— Controls Labels & KPI updates ——
+    function hookControls(){
+      const updateLabels = () => {
+        crLabel.textContent = `${completion.value}%`;
+        slLabel.textContent = `${session.value}`;
+        fcLabel.textContent = `${freq.value}`;
+        rwLabel.textContent = `${reward.value}`;
+        updateKpis();
+        updateTips();
+      };
+      [geo, format, completion, session, freq, reward].forEach(el=>{
+        el.addEventListener('input', updateLabels);
+        el.addEventListener('change', updateLabels);
+      });
+      updateLabels();
+    }
 
-    // বিজ্ঞাপন বাটনের হ্যান্ডলার (GigaPub integration সহ)
+    // —— Dynamic tips based on settings ——
+    const tipsList = document.getElementById('tipsList');
+    function updateTips(){
+      const g = geo.value, f = format.value, fc = Number(freq.value), cr = Number(completion.value);
+      const tips = [];
+      if (['US','GB','DE','CA','AU'].includes(g)) tips.push('High‑value GEO সেট করা আছে — eCPM সাধারণত বেশি হবে।');
+      else tips.push('Low/Mid GEO — global growth বা premium ইউজার টার্গেট করলে eCPM বাড়বে।');
+      if (f !== 'rewarded') tips.push('Rewarded ফরম্যাট নিলে eCPM সাধারণত বাড়ে।');
+      if (cr < 70) tips.push('Completion rate < 70% — ছোট reward বা better placement দিন।');
+      if (fc > 3) tips.push('Frequency cap বেশি — 1–3 এ আনলে ad fatigue কমবে।');
+      if (tips.length === 0) tips.push('সেটিংস দারুণ! এখন শুধু ট্র্যাফিক স্কেল করুন।');
+      tipsList.innerHTML = tips.map(t=>`<li>${t}</li>`).join('');
+    }
+
+    // —— Ad Button ——
     adsBtn.addEventListener('click', () => {
-      if (typeof window.showGiga === "function") {
-        window.showGiga("main")
+      const rw = Number(reward.value);
+      if (typeof window.showGiga === 'function'){
+        window.showGiga('main')
           .then(() => {
-            count += 10; // reward +10
-            adsCount += 1; // বিজ্ঞাপন কাউন্টার +1
-            render();
-            glow(); // glow effect after reward
-
-            if (tg) {
-              tg.sendData(JSON.stringify({ action: 'ads_reward', reward: 10, total: count, adsWatched: adsCount }));
-            }
-            alert(`Reward unlocked! 🎉 +10 পয়েন্ট যোগ হয়েছে। Ads watched: ${adsCount}`);
+            points += rw; adsWatched += 1; updateKpis(); glow(kpiPoints); glow(kpiAds);
+            if (tg) tg.sendData(JSON.stringify({ action:'ads_reward', reward: rw, total: points, adsWatched }));
+            alert(`Reward unlocked! +${rw} points`);
           })
           .catch(e => {
-            console.error("GigaPub error:", e);
-            alert("বিজ্ঞাপন লোড হয়নি। পরে আবার চেষ্টা করুন।");
+            console.error('GigaPub error:', e);
+            alert('বিজ্ঞাপন লোড হয়নি। পরে আবার চেষ্টা করুন।');
           });
       } else {
+        // SDK missing → fallback
         if (tg) {
-          tg.sendData(JSON.stringify({ action: 'show_ads' }));
-          tg.HapticFeedback.notificationOccurred('success');
+          tg.sendData(JSON.stringify({ action:'show_ads' }));
+          tg.HapticFeedback?.notificationOccurred('success');
         } else {
-          alert("বিজ্ঞাপন বাটন ক্লিক হয়েছে (ডেমো মোড)");
+          alert('বিজ্ঞাপন বাটন ক্লিক হয়েছে (ডেমো মোড)');
         }
       }
     });
 
-    if (tg) {
-      try {
-        tg.expand();
-        tg.ready();
-        statusEl.textContent = 'Running inside Telegram Mini App.';
-
-        tg.onEvent('mainButtonClicked', () => {
-          tg.HapticFeedback.impactOccurred('light');
-          tg.close();
-        });
-      } catch (e) {
-        statusEl.textContent = 'Telegram context detected, but init failed.';
-        console.error(e);
-      }
+    // —— Telegram ready ——
+    if (tg){
+      try{ tg.expand(); tg.ready(); statusEl.textContent = 'Running inside Telegram Mini App.'; }
+      catch(e){ statusEl.textContent = 'Telegram detected, but init failed.'; }
+      tg.onEvent?.('mainButtonClicked', ()=> tg.close());
     } else {
       statusEl.textContent = 'Not in Telegram — running in a normal browser.';
     }
 
-    render();
+    hookControls();
+    updateKpis();
   </script></body>
 </html>
