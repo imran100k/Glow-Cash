@@ -4,26 +4,33 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Telegram Mini App • Tap Counter</title>
+  <title>Telegram Mini App • Reward Counter</title>
   <style>
     :root{
       --bg:#0f1115; --card:#161a22; --text:#e7eaf3; --muted:#9aa4bc; --accent:#4c8bf5;
     }
     *{box-sizing:border-box}
     html,body{height:100%;margin:0}
-    body{background:var(--bg);color:var(--text);font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans, "Apple Color Emoji","Segoe UI Emoji"; display:grid; place-items:center;}
+    body{background:var(--bg);color:var(--text);font:16px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Noto Sans; display:grid; place-items:center;}
     .card{width:min(440px,92vw); background:var(--card); border-radius:20px; padding:24px; box-shadow:0 8px 32px rgba(0,0,0,.35);}
     h1{margin:0 0 6px;font-size:22px}
     p{margin:0 0 16px;color:var(--muted)}
     .meter{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 0 18px}
-    .count{font-variant-numeric:tabular-nums; font-size:42px; font-weight:700}
+    .count{font-variant-numeric:tabular-nums; font-size:48px; font-weight:700; text-shadow:0 0 12px rgba(76,139,245,0.6); transition: all 0.3s ease;}
+    .count.glow{
+      animation:pulse 1s ease-in-out 3;
+    }
+    @keyframes pulse{
+      0%{text-shadow:0 0 12px rgba(76,139,245,0.6)}
+      50%{text-shadow:0 0 28px rgba(76,139,245,1)}
+      100%{text-shadow:0 0 12px rgba(76,139,245,0.6)}
+    }
     .btn{appearance:none;border:0;border-radius:16px;padding:16px 18px; font-size:18px; font-weight:700; cursor:pointer; width:100%; background:var(--accent); color:white; transition:transform .03s ease;}
     .btn:active{transform:scale(.98)}
     .row{display:flex; gap:10px}
     .ghost{background:transparent; border:1.5px solid #2a3244; color:var(--text)}
     .kicker{font-size:12px; color:var(--muted); margin-top:10px}
     .warn{color:#ffd166}
-    .ok{color:#9ae6b4}
     code{background:#0c0f14;border:1px solid #222836;border-radius:8px;padding:2px 6px}
   </style>
   <!-- GigaPub SDK -->
@@ -31,13 +38,11 @@
 </head>
 <body>
   <div class="card">
-    <h1>Tap Counter</h1>
-    <p>Example Telegram Mini App using <code>Telegram.WebApp</code>. Manual taps only.</p><div class="meter">
+    <h1>Reward Counter</h1>
+    <p>Tap removed. Earn rewards by watching ads.</p><div class="meter">
   <div class="kicker">Total</div>
   <div class="count" id="count">0</div>
 </div>
-
-<button id="tapBtn" class="btn">Tap</button>
 
 <div class="row" style="margin-top:10px">
   <button id="resetBtn" class="btn ghost">Reset</button>
@@ -53,11 +58,9 @@
 <p class="kicker warn">⚠️ Auto‑clicking/automation can violate app rules & Telegram/TOS. This demo intentionally disables any programmatic tapping inside Telegram.</p>
 
   </div>  <script>
-    // Detect Telegram Mini App environment
     const tg = window.Telegram ? window.Telegram.WebApp : null;
     const statusEl = document.getElementById('status');
     const countEl = document.getElementById('count');
-    const tapBtn = document.getElementById('tapBtn');
     const resetBtn = document.getElementById('resetBtn');
     const themeBtn = document.getElementById('themeBtn');
     const adsBtn = document.getElementById('adsBtn');
@@ -72,11 +75,10 @@
       }
     }
 
-    // Manual tapping only
-    tapBtn.addEventListener('click', () => {
-      count++;
-      render();
-    });
+    function glow(){
+      countEl.classList.add('glow');
+      setTimeout(()=> countEl.classList.remove('glow'), 3000);
+    }
 
     resetBtn.addEventListener('click', () => {
       count = 0; render();
@@ -94,12 +96,11 @@
     // বিজ্ঞাপন বাটনের হ্যান্ডলার (GigaPub integration সহ)
     adsBtn.addEventListener('click', () => {
       if (typeof window.showGiga === "function") {
-        // 👉 GigaPub SDK ব্যবহার
         window.showGiga("main")
           .then(() => {
-            // বিজ্ঞাপন সফলভাবে দেখা হয়েছে → Reward logic
-            count += 10; // উদাহরণস্বরূপ: প্রতি বিজ্ঞাপন reward +10
+            count += 10; // reward +10
             render();
+            glow(); // glow effect after reward
 
             if (tg) {
               tg.sendData(JSON.stringify({ action: 'ads_reward', reward: 10, total: count }));
@@ -111,7 +112,6 @@
             alert("বিজ্ঞাপন লোড হয়নি। পরে আবার চেষ্টা করুন।");
           });
       } else {
-        // GigaPub SDK না থাকলে fallback
         if (tg) {
           tg.sendData(JSON.stringify({ action: 'show_ads' }));
           tg.HapticFeedback.notificationOccurred('success');
@@ -121,7 +121,6 @@
       }
     });
 
-    // Telegram integration (safe)
     if (tg) {
       try {
         tg.expand();
@@ -139,25 +138,6 @@
     } else {
       statusEl.textContent = 'Not in Telegram — running in a normal browser.';
     }
-
-    (function addQaHelper(){
-      if (tg) return;
-      const params = new URLSearchParams(location.search);
-      if (!params.has('qa')) return;
-      const qaBtn = document.createElement('button');
-      qaBtn.textContent = 'Start QA (slow auto-tap)';
-      qaBtn.className = 'btn ghost';
-      qaBtn.style.marginTop = '10px';
-      document.querySelector('.card').appendChild(qaBtn);
-      let qaInterval = null;
-      qaBtn.addEventListener('click', () => {
-        if (qaInterval) { clearInterval(qaInterval); qaInterval = null; qaBtn.textContent = 'Start QA (slow auto-tap)'; return; }
-        qaBtn.textContent = 'Stop QA';
-        qaInterval = setInterval(() => {
-          tapBtn.click();
-        }, 1000);
-      });
-    })();
 
     render();
   </script></body>
