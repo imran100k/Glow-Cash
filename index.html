@@ -1,21 +1,23 @@
 <script src="https://ad.gigapub.tech/script?id=1731"></script>
 <script>
-  // ✅ স্ক্রিপ্ট লোড হবার পর স্বয়ংক্রিয়ভাবে ad দেখাবে
+  // ✅ Telegram Mini App লোড হলে অটো বিজ্ঞাপন দেখাও
   window.addEventListener("load", () => {
-    function showAutoAd() {
-      if (window.gigaPub) {
-        gigaPub.loadInterstitial().then(() => {
-          gigaPub.showInterstitial();
-          console.log("✅ Auto Ad Shown on App Open");
-        }).catch(err => {
-          console.warn("⚠️ Ad failed:", err);
-        });
-      } else {
-        console.warn("⚠️ Ad script not loaded yet.");
+    async function showAutoAd() {
+      try {
+        if (window.showGiga) {
+          await window.showGiga("main");
+          console.log("✅ Reward ad shown successfully!");
+          // 👉 এখানে তোমার reward logic বসাও
+          alert("🎉 Congrats! You got your reward.");
+        } else {
+          console.warn("⚠️ GigaPub not ready yet.");
+        }
+      } catch (e) {
+        console.error("⚠️ Ad error:", e);
       }
     }
 
-    // ⏳ একটু ডিলে দিয়ে চেষ্টা করা (Telegram WebApp এ লোড হতে সময় লাগে)
+    // ⏳ ২ সেকেন্ড দেরি দিয়ে চেষ্টা করবো
     setTimeout(showAutoAd, 2000);
   });
 </script>
