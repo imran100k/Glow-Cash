@@ -1,14 +1,81 @@
-<script src="https://ad.gigapub.tech/script?id=1731"></script>
-<script>
-  // ✅ Telegram Mini App লোড হলে অটো বিজ্ঞাপন দেখাও
-  window.addEventListener("load", () => {
-    async function showAutoAd() {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Glow Cash — Telegram Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://ad.gigapub.tech/script?id=1731"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: radial-gradient(circle at center, #0f0f0f, #000000);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: rgba(20, 20, 30, 0.85);
+      padding: 28px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 0 25px rgba(0, 255, 180, 0.7),
+                  0 0 50px rgba(0, 200, 255, 0.4);
+      width: min(420px, 90%);
+      backdrop-filter: blur(10px);
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px cyan, 0 0 20px lime;
+    }
+    p {
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 12px 20px;
+      margin: 6px;
+      border: none;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #00ffc6, #00aaff);
+      color: #000;
+      box-shadow: 0 0 10px #00ffc6, 0 0 20px #00aaff;
+      transition: 0.3s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px #00ffc6, 0 0 40px #00aaff;
+    }
+    .footer {
+      margin-top: 15px;
+      font-size: 13px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>💎 Glow Cash</h1>
+    <p>Auto Ads • Rewards • Telegram Mini App</p>
+    <button id="btnAd">বিজ্ঞাপন দেখুন</button>
+    <button onclick="window.open('https://t.me/yourusername', '_blank')">ডেভেলপার</button>
+    <div class="footer">⚡ Ads will auto show every 30s inside Telegram</div>
+  </div>
+
+  <script>
+    async function showLoopAd() {
       try {
         if (window.showGiga) {
           await window.showGiga("main");
-          console.log("✅ Reward ad shown successfully!");
-          // 👉 এখানে তোমার reward logic বসাও
-          alert("🎉 Congrats! You got your reward.");
+          console.log("✅ Ad shown");
+          // 👉 এখানে reward logic বসাতে পারো
         } else {
           console.warn("⚠️ GigaPub not ready yet.");
         }
@@ -17,7 +84,16 @@
       }
     }
 
-    // ⏳ ২ সেকেন্ড দেরি দিয়ে চেষ্টা করবো
-    setTimeout(showAutoAd, 2000);
-  });
-</script>
+    // Manual Ad Button
+    document.getElementById("btnAd").onclick = showLoopAd;
+
+    // Auto Loop (first after 3s, then every 30s)
+    window.addEventListener("load", () => {
+      setTimeout(() => {
+        showLoopAd();
+        setInterval(showLoopAd, 30000);
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
