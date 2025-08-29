@@ -1,139 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini App</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://ad.gigapub.tech/script?id=1731"></script>
-  <style>
-    .active { color: #4f46e5; font-weight: 600; }
-  </style>
-</head>
-<body class="bg-gray-100 text-gray-800">
-  <!-- Header -->
-  <header class="bg-white shadow p-4 flex items-center space-x-3">
-    <img src="https://ui-avatars.com/api/?name=User&background=random" class="w-12 h-12 rounded-full">
-    <div>
-      <h2 id="userName" class="font-bold text-lg">Md Hossain Ali</h2>
-      <p id="userBalance" class="text-sm text-gray-600">BD 0.10</p>
-    </div>
-  </header>
-
-  <!-- Sections -->
-  <main class="p-4">
-    <!-- Home -->
-    <section id="homeSection">
-      <div class="bg-indigo-500 text-white p-4 rounded-xl mb-4">
-        <h2 class="font-semibold">Welcome, <span id="welcomeName">Md Hossain Ali</span>!</h2>
-        <p class="text-sm">Ready to boost your earnings?</p>
-        <button onclick="showSection('earnSection')" class="mt-3 bg-white text-indigo-600 px-4 py-2 rounded-lg">Start Earning Now 🚀</button>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div class="bg-white rounded-xl p-4 text-center shadow">
-          <p class="text-lg font-bold" id="earnings">BD 0.10</p>
-          <p class="text-sm text-gray-600">Total Earnings</p>
-        </div>
-        <div class="bg-white rounded-xl p-4 text-center shadow">
-          <p class="text-lg font-bold" id="adsWatched">1</p>
-          <p class="text-sm text-gray-600">Ads Watched</p>
-        </div>
-        <div class="bg-white rounded-xl p-4 text-center shadow col-span-2">
-          <p class="text-lg font-bold" id="referrals">0</p>
-          <p class="text-sm text-gray-600">Your Referrals</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Earn -->
-    <section id="earnSection" class="hidden">
-      <h2 class="text-xl font-bold mb-3">Earn</h2>
-      <button onclick="watchAd()" class="bg-indigo-500 text-white px-4 py-2 rounded-lg shadow">📢 Watch Ad</button>
-      <p id="rewardMsg" class="mt-3 text-green-600"></p>
-    </section>
-
-    <!-- Refer -->
-    <section id="referSection" class="hidden">
-      <h2 class="text-xl font-bold mb-3">Refer</h2>
-      <p>Your referral link:</p>
-      <div class="flex mt-2">
-        <input id="refLink" class="flex-1 border p-2 rounded-l" value="https://t.me/yourbot?start=ref123" readonly>
-        <button onclick="copyRef()" class="bg-indigo-500 text-white px-3 rounded-r">Copy</button>
-      </div>
-    </section>
-
-    <!-- Withdraw -->
-    <section id="withdrawSection" class="hidden">
-      <h2 class="text-xl font-bold mb-3">Withdraw</h2>
-      <form class="space-y-3">
-        <input type="number" placeholder="Amount" class="w-full border p-2 rounded">
-        <select class="w-full border p-2 rounded">
-          <option>bkash</option>
-          <option>Nagad</option>
-          <option>Rocket</option>
-        </select>
-        <button type="button" onclick="alert('Withdraw request sent!')" class="bg-indigo-500 text-white px-4 py-2 rounded-lg">Submit</button>
-      </form>
-    </section>
-
-    <!-- History -->
-    <section id="historySection" class="hidden">
-      <h2 class="text-xl font-bold mb-3">History</h2>
-      <ul id="historyList" class="space-y-2">
-        <li class="bg-white p-3 rounded shadow">Watched Ad - Earned BD 0.10</li>
-      </ul>
-    </section>
-
-    <!-- Profile -->
-    <section id="profileSection" class="hidden">
-      <h2 class="text-xl font-bold mb-3">Profile</h2>
-      <p>Name: <span id="profileName">Md Hossain Ali</span></p>
-      <p>Balance: <span id="profileBalance">BD 0.10</span></p>
-    </section>
-  </main>
-
-  <!-- Bottom Nav -->
-  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2">
-    <button onclick="showSection('homeSection')" id="homeBtn" class="active">Home</button>
-    <button onclick="showSection('earnSection')" id="earnBtn">Earn</button>
-    <button onclick="showSection('referSection')" id="referBtn">Refer</button>
-    <button onclick="showSection('withdrawSection')" id="withdrawBtn">Withdraw</button>
-    <button onclick="showSection('historySection')" id="historyBtn">History</button>
-    <button onclick="showSection('profileSection')" id="profileBtn">Profile</button>
-  </nav>
-
-  <script>
-    function showSection(id) {
-      document.querySelectorAll("main section").forEach(s => s.classList.add("hidden"));
-      document.getElementById(id).classList.remove("hidden");
-      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-      document.querySelector(`[onclick="showSection('${id}')"]`).classList.add("active");
-    }
-
-    function watchAd() {
-      window.showGiga("main")
-        .then(() => {
-          let bal = parseFloat(document.getElementById("earnings").innerText.replace("BD ",""));
-          bal += 0.10;
-          document.getElementById("earnings").innerText = "BD " + bal.toFixed(2);
-          document.getElementById("userBalance").innerText = "BD " + bal.toFixed(2);
-          document.getElementById("profileBalance").innerText = "BD " + bal.toFixed(2);
-          let ads = parseInt(document.getElementById("adsWatched").innerText) + 1;
-          document.getElementById("adsWatched").innerText = ads;
-          document.getElementById("rewardMsg").innerText = "✅ Ad watched! Earned BD 0.10";
-          document.getElementById("historyList").innerHTML += `<li class="bg-white p-3 rounded shadow">Watched Ad - Earned BD 0.10</li>`;
-        })
-        .catch(e => {
-          document.getElementById("rewardMsg").innerText = "❌ Ad failed: " + e.message;
+<script src="https://ad.gigapub.tech/script?id=1731"></script>
+<script>
+  // ✅ স্ক্রিপ্ট লোড হবার পর স্বয়ংক্রিয়ভাবে ad দেখাবে
+  window.addEventListener("load", () => {
+    function showAutoAd() {
+      if (window.gigaPub) {
+        gigaPub.loadInterstitial().then(() => {
+          gigaPub.showInterstitial();
+          console.log("✅ Auto Ad Shown on App Open");
+        }).catch(err => {
+          console.warn("⚠️ Ad failed:", err);
         });
+      } else {
+        console.warn("⚠️ Ad script not loaded yet.");
+      }
     }
 
-    function copyRef() {
-      let link = document.getElementById("refLink");
-      link.select();
-      navigator.clipboard.writeText(link.value);
-      alert("Referral link copied!");
-    }
-  </script>
-</body>
-</html>
+    // ⏳ একটু ডিলে দিয়ে চেষ্টা করা (Telegram WebApp এ লোড হতে সময় লাগে)
+    setTimeout(showAutoAd, 2000);
+  });
+</script>
