@@ -1,219 +1,393 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Glow Cash — Tap the Coin</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Glow Cash — Car Rush</title>
 
-  <!-- Telegram WebApp SDK -->
+  <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-  <!-- GigaPub Ads -->
+  <!-- Giga.pub ad script (আপনি যদি অন্য id চান সেটা বদলান) -->
   <script src="https://ad.gigapub.tech/script?id=1731"></script>
 
   <style>
     :root{
-      --bg1:#1a1a1a; --bg2:#2d2d2d;
-      --panel:#181c24; --card:#212836;
-      --text:#eef2f7; --muted:#9fb0c7;
-      --cyan:#00ffd0; --vio:#a78bfa;
+      --bg:#0b0f14; --card:#101826; --accent:#00ffd0; --accent2:#a78bfa;
+      --danger:#ff5c5c; --muted:#9aa9bf;
     }
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0}
+    html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial}
     body{
-      font-family: ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
-      color:var(--text);
-      background: radial-gradient(900px 600px at 120% -20%, rgba(0,255,208,.06), transparent),
-                  radial-gradient(800px 500px at -20% 120%, rgba(167,139,250,.06), transparent),
-                  linear-gradient(145deg,var(--bg1),var(--bg2));
-      display:grid;place-items:center;padding:16px;
+      background: linear-gradient(135deg, #07101a, #111827);
+      display:flex;align-items:center;justify-content:center;padding:16px;color:#e6eef6;
     }
 
-    .shell{width:min(420px,96vw)}
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 60%), var(--card);
-      border-radius:22px;padding:16px;box-shadow:0 12px 32px rgba(0,0,0,.45);
-      border:1px solid rgba(255,255,255,.06);
-    }
-
-    .top{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px
-    }
-    .brand{display:flex;align-items:center;gap:10px}
-    .logo{width:40px;height:40px;border-radius:12px;
-      background:linear-gradient(135deg,var(--cyan),#5afff2);
-      display:grid;place-items:center;color:#05201a;font-weight:900;
-      box-shadow:0 6px 18px rgba(0,255,208,.4)}
+    /* Game container */
+    .wrap{width:min(480px,96vw); max-width:600px;}
+    .hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px}
+    .brand{display:flex;align-items:center;gap:8px}
+    .logo{width:44px;height:44;border-radius:10px;background:linear-gradient(135deg,var(--accent),#53ffe9);display:grid;place-items:center;color:#062024;font-weight:900}
     .title{font-weight:800}
-    .sub{font-size:12px;color:var(--muted)}
+    .score-box{background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:10px;font-weight:700;color:var(--accent);}
 
-    .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
-    .pill{background:var(--panel);border-radius:12px;padding:10px;text-align:center;
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
-    .pill h4{margin:0 0 6px;font-size:11px;color:var(--muted);letter-spacing:.2px}
-    .pill .v{font-size:18px;font-weight:800}
+    /* Canvas area */
+    .stage{position:relative;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#081218,#0f1724);box-shadow:0 12px 40px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.04)}
+    canvas{display:block;width:100%;height:auto;background:transparent}
 
-    .arena{
-      position:relative;overflow:hidden;border-radius:16px;height:420px;
-      background: radial-gradient(400px 220px at 20% 10%, rgba(0,255,208,.10), transparent),
-                  radial-gradient(500px 260px at 90% 90%, rgba(167,139,250,.10), transparent),
-                  #0f1420;
-      border:1px solid rgba(255,255,255,.06);
-    }
+    /* Controls */
+    .controls{display:flex;gap:8px;margin-top:10px}
+    .btn{flex:1;padding:12px;border-radius:12px;border:0;font-weight:800;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#041017;box-shadow:0 10px 24px rgba(0,255,208,0.12)}
+    .btn.secondary{background:rgba(255,255,255,0.04);color:#e6eef6}
 
-    .coin{
-      position:absolute;width:72px;height:72px;border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, #fff7b0, #ffd54a 60%, #e6a300 100%);
-      box-shadow:0 0 18px rgba(250,204,21,.55),0 0 38px rgba(0,255,208,.25);
-      display:grid;place-items:center;font-size:26px;font-weight:900;color:#3a2b00;
-      cursor:pointer;user-select:none;transform:translate(-50%,-50%);
-      animation:float 2.2s ease-in-out infinite;
-    }
-    @keyframes float{
-      0%,100%{transform:translate(-50%,-50%) translateY(-3px)}
-      50%{transform:translate(-50%,-50%) translateY(3px)}
-    }
+    .note{margin-top:8px;color:var(--muted);font-size:13px;text-align:center}
+    .ad-slot{margin-top:10px;background:rgba(255,255,255,0.02);padding:10px;border-radius:10px;text-align:center;color:var(--muted);font-weight:600}
 
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-    .btn{
-      appearance:none;border:0;border-radius:14px;padding:12px;font-weight:800;font-size:15px;cursor:pointer
-    }
-    .btn-primary{
-      background:linear-gradient(135deg,var(--cyan),#44ffe6); color:#0b0f14;
-      box-shadow:0 10px 24px rgba(0,255,208,.35)
-    }
-    .btn-ghost{background:rgba(255,255,255,.06);color:var(--text)}
-    .ad-note{margin-top:10px;text-align:center;color:var(--muted);font-size:12px}
+    /* game over modal */
+    .modal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .18s}
+    .modal.show{opacity:1;pointer-events:auto}
+    .modal-card{background:#08121a;padding:20px;border-radius:12px;text-align:center;min-width:220px}
+    .modal h3{margin:0 0 8px}
+    .modal p{margin:0 0 12px;color:var(--muted)}
+    .modal button{padding:10px 14px;border-radius:10px;border:0;font-weight:800;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#041017}
   </style>
 </head>
 <body>
-  <div class="shell">
-    <div class="card">
-      <div class="top">
-        <div class="brand">
-          <div class="logo">💎</div>
-          <div>
-            <div class="title">Glow Cash — Tap the Coin</div>
-            <div class="sub">ট্যাপ করে স্কোর বাড়াও • রিওয়ার্ড আনলক করো</div>
-          </div>
+  <div class="wrap">
+    <div class="hud">
+      <div class="brand">
+        <div class="logo">💎</div>
+        <div>
+          <div class="title">Glow Cash — Car Rush</div>
+          <div style="font-size:12px;color:var(--muted)">Swipe বা ← → দিয়ে চালাও</div>
         </div>
-        <button class="btn btn-ghost" id="btnDev">👨‍💻 ডেভ</button>
       </div>
-
-      <div class="stats">
-        <div class="pill"><h4>স্কোর</h4><div class="v" id="score">0</div></div>
-        <div class="pill"><h4>বেস্ট</h4><div class="v" id="best">0</div></div>
-        <div class="pill"><h4>টাইম</h4><div class="v" id="time">30s</div></div>
-      </div>
-
-      <div class="arena" id="arena">
-        <div class="coin" id="coin">৳</div>
-      </div>
-
-      <div class="row">
-        <button class="btn btn-primary" id="btnStart">▶ শুরু</button>
-        <button class="btn btn-ghost" id="btnReset">↻ রিসেট</button>
-      </div>
-
-      <div class="ad-note">ℹ️ প্রতি ৫ ট্যাপ পরপর বিজ্ঞাপন স্বয়ংক্রিয়ভাবে দেখানো হবে</div>
+      <div class="score-box" id="scoreBox">Score: 0</div>
     </div>
+
+    <div class="stage" id="stage">
+      <canvas id="game"></canvas>
+
+      <!-- Game over modal -->
+      <div class="modal" id="modal">
+        <div class="modal-card">
+          <h3 id="moTitle">গেম ওভার</h3>
+          <p id="moText">স্কোর: 0</p>
+          <button id="btnRestart">আবার খেলা শুরু</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="btnLeft" class="btn secondary">◀️</button>
+      <button id="btnStart" class="btn">▶ শুরু</button>
+      <button id="btnRight" class="btn secondary">▶️</button>
+    </div>
+
+    <div class="ad-slot" id="adSlot">Banner ad will load automatically (Giga.pub)</div>
+    <div class="note">প্রতি ১৫ সেকেন্ড বা Game Over-এ Ad দেখানো হবে</div>
   </div>
 
-  <script>
-    // --- Telegram context (optional UX) ---
-    const tg = window.Telegram?.WebApp;
-    if (tg) { try { tg.ready(); tg.expand(); } catch(_){} }
+<script>
+/* ------------------------------
+  Simple Car Game (Canvas)
+  - 3 lanes
+  - player car moves left/right
+  - obstacles spawn from top and move down
+  - collision detection
+  - auto ads via showGiga / gigaPub
+-------------------------------*/
 
-    // --- Game state ---
-    const $ = id => document.getElementById(id);
-    const coin = $('coin'), arena = $('arena');
-    const scoreEl = $('score'), bestEl = $('best'), timeEl = $('time');
+const canvas = document.getElementById('game');
+const stage = document.getElementById('stage');
+const modal = document.getElementById('modal');
+const moText = document.getElementById('moText');
+const scoreBox = document.getElementById('scoreBox');
 
-    let playing = false, score = 0, best = Number(localStorage.getItem('gc_best')||0);
-    let timer = 30, tickId = null, adEvery = 5;
+let ctx, W, H, lastTime;
 
-    bestEl.textContent = best.toString();
+function resizeCanvas(){
+  const rect = stage.getBoundingClientRect();
+  W = rect.width;
+  H = Math.round(W * 1.6); // portrait tall
+  canvas.width = W;
+  canvas.height = H;
+  canvas.style.height = H + 'px';
+  ctx = canvas.getContext('2d');
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
-    function rng(min,max){ return Math.random()*(max-min)+min; }
+/* Game variables */
+const lanes = 3;
+let laneX = []; // center x positions
+let player = {lane:1, w:72, h:120, y:0};
+let obstacles = [];
+let obstacleTimer = 0;
+let obstacleInterval = 900; // ms
+let speed = 220; // pixels per second for obstacles
+let running = false;
+let score = 0;
+let best = Number(localStorage.getItem('gc_car_best')||0);
+let spawnCount = 0;
 
-    function placeCoin(){
-      const pad = 60; // avoid edges
-      const rect = arena.getBoundingClientRect();
-      const x = rng(pad, rect.width-pad);
-      const y = rng(pad, rect.height-pad);
-      coin.style.left = x + 'px';
-      coin.style.top  = y + 'px';
+/* Ads config */
+const AUTO_AD_INTERVAL = 15000; // ms — auto ad every 15s
+let lastAdTime = 0;
+let adLoopId = null;
+let adLock = false;
+
+/* initialize lanes and positions */
+function initPositions(){
+  laneX = [];
+  const laneWidth = W / lanes;
+  for(let i=0;i<lanes;i++){
+    laneX.push(laneWidth*i + laneWidth/2);
+  }
+  player.y = H - player.h - 20;
+  player.x = laneX[player.lane] - player.w/2;
+}
+
+/* draw functions */
+function drawRoundedRect(x,y,w,h,r,fillStyle){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+  ctx.fillStyle = fillStyle;
+  ctx.fill();
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  // road background
+  const grad = ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'#08121a'); grad.addColorStop(1,'#071018');
+  ctx.fillStyle = grad; ctx.fillRect(0,0,W,H);
+
+  // lane lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 2;
+  for(let i=1;i<lanes;i++){
+    const x = (W/lanes)*i;
+    ctx.setLineDash([12,12]);
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // obstacles
+  for(const ob of obstacles){
+    drawRoundedRect(ob.x - ob.w/2, ob.y, ob.w, ob.h, 10, ob.color);
+    // small highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(ob.x - ob.w/2 + 8, ob.y + 8, 8, 12);
+  }
+
+  // player car
+  drawRoundedRect(player.x, player.y, player.w, player.h, 12, '#ffd166');
+  ctx.fillStyle = '#3a2b00';
+  ctx.font = '700 22px sans-serif';
+  ctx.textAlign = 'center'; ctx.fillText('🚗', player.x + player.w/2, player.y + player.h/2 + 8);
+
+  // score
+  ctx.fillStyle = '#cfeff0';
+  ctx.font = '600 18px sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('Score: ' + score, 12, 28);
+}
+
+/* game loop */
+function update(dt){
+  // move obstacles
+  for(const ob of obstacles){
+    ob.y += speed * dt;
+  }
+  // remove offscreen obstacles and increment score
+  for(let i=obstacles.length-1;i>=0;i--){
+    if(obstacles[i].y > H){
+      obstacles.splice(i,1);
+      score += 1;
+      updateScoreUI();
     }
-
-    function setScore(v){
-      score = v; scoreEl.textContent = score.toString();
-      if(score>best){ best = score; bestEl.textContent=best; localStorage.setItem('gc_best',best); }
+  }
+  // spawn
+  obstacleTimer += dt*1000;
+  if(obstacleTimer > obstacleInterval){
+    obstacleTimer = 0;
+    spawnObstacle();
+  }
+  // collision
+  for(const ob of obstacles){
+    if(rectsOverlap(player.x, player.y, player.w, player.h, ob.x - ob.w/2, ob.y, ob.w, ob.h)){
+      gameOver();
+      return;
     }
+  }
+}
 
-    function startGame(){
-      if (playing) return;
-      playing = true; setScore(0); timer = 30; timeEl.textContent = timer+'s';
-      placeCoin(); coin.style.pointerEvents = 'auto';
-      // countdown
-      tickId = setInterval(()=>{
-        timer--; timeEl.textContent = timer+'s';
-        if(timer<=0){ endGame(); }
-      },1000);
+function loop(ts){
+  if(!lastTime) lastTime = ts;
+  const dt = (ts - lastTime)/1000;
+  lastTime = ts;
+  if(running) update(dt);
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* helpers */
+function rectsOverlap(x1,y1,w1,h1,x2,y2,w2,h2){
+  return !(x1 + w1 < x2 || x2 + w2 < x1 || y1 + h1 < y2 || y2 + h2 < y1);
+}
+
+function spawnObstacle(){
+  spawnCount++;
+  // choose lane and size
+  const lane = Math.floor(Math.random()*lanes);
+  const w = 60 + Math.random()*40;
+  const h = 60 + Math.random()*40;
+  const x = laneX[lane];
+  const y = -h;
+  const color = spawnCount%2===0 ? '#ef4444' : '#a78bfa';
+  obstacles.push({x,y,w,h,color,lane});
+  // gradually increase difficulty
+  if(spawnCount % 8 === 0) speed += 12;
+  if(spawnCount % 10 === 0 && obstacleInterval>420) obstacleInterval -= 60;
+}
+
+/* input */
+function movePlayerToLane(l){
+  player.lane = Math.max(0, Math.min(lanes-1, l));
+  player.x = laneX[player.lane] - player.w/2;
+}
+document.getElementById('btnLeft').addEventListener('click', ()=> movePlayerToLane(player.lane-1));
+document.getElementById('btnRight').addEventListener('click', ()=> movePlayerToLane(player.lane+1));
+document.getElementById('btnStart').addEventListener('click', startGame);
+document.getElementById('btnRestart').addEventListener('click', ()=>{ hideModal(); startGame(); });
+
+window.addEventListener('keydown', (e)=>{
+  if(e.key === 'ArrowLeft' || e.key === 'a') movePlayerToLane(player.lane-1);
+  if(e.key === 'ArrowRight' || e.key === 'd') movePlayerToLane(player.lane+1);
+});
+
+/* touch swipe */
+let touchStartX = null;
+stage.addEventListener('touchstart', (e)=>{ touchStartX = e.changedTouches[0].clientX; });
+stage.addEventListener('touchend', (e)=>{
+  if(touchStartX == null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if(Math.abs(dx) > 30){
+    if(dx < 0) movePlayerToLane(player.lane-1);
+    else movePlayerToLane(player.lane+1);
+  }
+  touchStartX = null;
+});
+
+/* game control */
+function startGame(){
+  // reset variables
+  running = true;
+  obstacles = [];
+  score = 0;
+  speed = 220;
+  spawnCount = 0;
+  obstacleInterval = 900;
+  obstacleTimer = 0;
+  lastTime = 0;
+  updateScoreUI();
+  initPositions();
+  placeInitialObstacles();
+  // start autoad loop
+  startAdLoop();
+}
+function placeInitialObstacles(){ for(let i=0;i<2;i++) spawnObstacle(); }
+
+function updateScoreUI(){
+  scoreBox.textContent = 'Score: ' + score;
+}
+
+/* game over */
+function gameOver(){
+  running = false;
+  // stop ad loop
+  stopAdLoop();
+  // show modal
+  moText.textContent = 'স্কোর: ' + score;
+  modal.classList.add('show');
+  // update best
+  if(score > best){ best = score; localStorage.setItem('gc_car_best', best); }
+  // show ad on game over
+  showAdSafe();
+  // offer restart
+}
+
+/* hide modal */
+function hideModal(){ modal.classList.remove('show'); }
+
+/* init positions on load & resize */
+initPositions();
+window.addEventListener('load', initPositions);
+
+/* place coin uses lane centers - adjust after resize */
+function initPositions(){
+  const laneWidth = W / lanes;
+  laneX = [];
+  for(let i=0;i<lanes;i++) laneX.push(laneWidth*i + laneWidth/2);
+  player.x = laneX[player.lane] - player.w/2;
+  player.y = H - player.h - 20;
+}
+
+/* ad helpers - prefer showGiga (rewarded/main), fallback to gigaPub interstitial */
+async function showAdSafe(){
+  if(adLock) return;
+  adLock = true;
+  try{
+    // prefer showGiga
+    if(typeof window.showGiga === 'function'){
+      await window.showGiga('main');
+      console.log('Giga showGiga OK');
+    } else if(window.gigaPub && typeof window.gigaPub.loadInterstitial === 'function'){
+      await window.gigaPub.loadInterstitial();
+      window.gigaPub.showInterstitial();
+      console.log('gigaPub interstitial OK');
+    } else {
+      console.warn('Ad SDK not ready');
     }
+  }catch(e){
+    console.warn('Ad error:', e);
+  }finally{
+    setTimeout(()=>{ adLock = false; }, 1800); // cooldown
+  }
+}
 
-    function endGame(){
-      playing = false; coin.style.pointerEvents = 'none';
-      clearInterval(tickId);
-      // show ad at game over, but not to spam
-      showAdSafe();
-      if (tg?.showAlert) tg.showAlert(`গেম শেষ! স্কোর: ${score}`);
-      else alert(`গেম শেষ! স্কোর: ${score}`);
-    }
+/* Auto ad loop (every AUTO_AD_INTERVAL ms) */
+function startAdLoop(){
+  stopAdLoop();
+  lastAdTime = Date.now();
+  // first try after 3s
+  setTimeout(()=> showAdSafe(), 3000);
+  adLoopId = setInterval(()=> showAdSafe(), AUTO_AD_INTERVAL);
+}
+function stopAdLoop(){
+  if(adLoopId) { clearInterval(adLoopId); adLoopId = null; }
+}
 
-    coin.addEventListener('click', ()=>{
-      if(!playing) return;
-      setScore(score+1);
-      placeCoin();
-      // every N taps: show ad
-      if (score % adEvery === 0){ showAdSafe(); }
-    });
+/* placeholder banner if ad slot empty */
+setTimeout(()=>{
+  const adSlot = document.getElementById('adSlot');
+  if(adSlot && adSlot.children.length === 0){
+    adSlot.innerHTML = '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);box-shadow:0 8px 20px rgba(0,0,0,0.4);color:var(--muted)">🎯 Placeholder banner while review or not ready</div>';
+  }
+},2200);
 
-    $('btnStart').onclick = startGame;
-    $('btnReset').onclick = ()=>{
-      setScore(0); timer = 30; timeEl.textContent = '30s'; placeCoin();
-    };
-    $('btnDev').onclick = ()=> {
-      const link = 'https://t.me/GlowCashDev';
-      if (tg?.openTelegramLink) tg.openTelegramLink(link); else window.open(link,'_blank');
-    };
-
-    // --- Ad helper: prefer Rewarded API, fallback to interstitial ---
-    let adLock = false; // prevent overlapping calls
-    async function showAdSafe(){
-      if (adLock) return;
-      adLock = true;
-      try{
-        if (typeof window.showGiga === 'function'){
-          await window.showGiga('main'); // rewarded/main placement
-        } else if (window.gigaPub){
-          await window.gigaPub.loadInterstitial();
-          window.gigaPub.showInterstitial();
-        } else {
-          console.warn('Ad SDK not ready');
-        }
-      } catch(e){
-        console.warn('Ad error:', e);
-      } finally{
-        // small cool-down to avoid accidental loops
-        setTimeout(()=>{ adLock = false; }, 1500);
-      }
-    }
-
-    // Auto ad on open (after small delay)
-    window.addEventListener('load', ()=> {
-      placeCoin();
-      setTimeout(()=> showAdSafe(), 3000);
-    });
-  </script>
+/* ensure canvas sizing for first render */
+(function ensureResize(){
+  resizeCanvas();
+  initPositions();
+  placeInitialObstacles();
+})();
+</script>
 </body>
 </html>
