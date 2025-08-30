@@ -1,98 +1,218 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Glow Cash — Telegram Mini App</title>
+  <title>Glow Cash — Tap the Coin</title>
+
+  <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- GigaPub Ads -->
   <script src="https://ad.gigapub.tech/script?id=1731"></script>
+
   <style>
-    body {
-      margin: 0;
-      font-family: "Segoe UI", sans-serif;
-      background: radial-gradient(circle at center, #0f0f0f, #000000);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    :root{
+      --bg1:#1a1a1a; --bg2:#2d2d2d;
+      --panel:#181c24; --card:#212836;
+      --text:#eef2f7; --muted:#9fb0c7;
+      --cyan:#00ffd0; --vio:#a78bfa;
     }
-    .card {
-      background: rgba(20, 20, 30, 0.85);
-      padding: 28px;
-      border-radius: 20px;
-      text-align: center;
-      box-shadow: 0 0 25px rgba(0, 255, 180, 0.7),
-                  0 0 50px rgba(0, 200, 255, 0.4);
-      width: min(420px, 90%);
-      backdrop-filter: blur(10px);
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{
+      font-family: ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      color:var(--text);
+      background: radial-gradient(900px 600px at 120% -20%, rgba(0,255,208,.06), transparent),
+                  radial-gradient(800px 500px at -20% 120%, rgba(167,139,250,.06), transparent),
+                  linear-gradient(145deg,var(--bg1),var(--bg2));
+      display:grid;place-items:center;padding:16px;
     }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 10px;
-      text-shadow: 0 0 10px cyan, 0 0 20px lime;
+
+    .shell{width:min(420px,96vw)}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 60%), var(--card);
+      border-radius:22px;padding:16px;box-shadow:0 12px 32px rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.06);
     }
-    p {
-      color: #aaa;
-      margin-bottom: 20px;
+
+    .top{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px
     }
-    button {
-      padding: 12px 20px;
-      margin: 6px;
-      border: none;
-      border-radius: 12px;
-      font-weight: bold;
-      font-size: 15px;
-      cursor: pointer;
-      background: linear-gradient(135deg, #00ffc6, #00aaff);
-      color: #000;
-      box-shadow: 0 0 10px #00ffc6, 0 0 20px #00aaff;
-      transition: 0.3s;
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:40px;height:40px;border-radius:12px;
+      background:linear-gradient(135deg,var(--cyan),#5afff2);
+      display:grid;place-items:center;color:#05201a;font-weight:900;
+      box-shadow:0 6px 18px rgba(0,255,208,.4)}
+    .title{font-weight:800}
+    .sub{font-size:12px;color:var(--muted)}
+
+    .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+    .pill{background:var(--panel);border-radius:12px;padding:10px;text-align:center;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+    .pill h4{margin:0 0 6px;font-size:11px;color:var(--muted);letter-spacing:.2px}
+    .pill .v{font-size:18px;font-weight:800}
+
+    .arena{
+      position:relative;overflow:hidden;border-radius:16px;height:420px;
+      background: radial-gradient(400px 220px at 20% 10%, rgba(0,255,208,.10), transparent),
+                  radial-gradient(500px 260px at 90% 90%, rgba(167,139,250,.10), transparent),
+                  #0f1420;
+      border:1px solid rgba(255,255,255,.06);
     }
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 20px #00ffc6, 0 0 40px #00aaff;
+
+    .coin{
+      position:absolute;width:72px;height:72px;border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #fff7b0, #ffd54a 60%, #e6a300 100%);
+      box-shadow:0 0 18px rgba(250,204,21,.55),0 0 38px rgba(0,255,208,.25);
+      display:grid;place-items:center;font-size:26px;font-weight:900;color:#3a2b00;
+      cursor:pointer;user-select:none;transform:translate(-50%,-50%);
+      animation:float 2.2s ease-in-out infinite;
     }
-    .footer {
-      margin-top: 15px;
-      font-size: 13px;
-      color: #888;
+    @keyframes float{
+      0%,100%{transform:translate(-50%,-50%) translateY(-3px)}
+      50%{transform:translate(-50%,-50%) translateY(3px)}
     }
+
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    .btn{
+      appearance:none;border:0;border-radius:14px;padding:12px;font-weight:800;font-size:15px;cursor:pointer
+    }
+    .btn-primary{
+      background:linear-gradient(135deg,var(--cyan),#44ffe6); color:#0b0f14;
+      box-shadow:0 10px 24px rgba(0,255,208,.35)
+    }
+    .btn-ghost{background:rgba(255,255,255,.06);color:var(--text)}
+    .ad-note{margin-top:10px;text-align:center;color:var(--muted);font-size:12px}
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>💎 Glow Cash</h1>
-    <p>Auto Ads • Rewards • Telegram Mini App</p>
-    <button id="btnAd">বিজ্ঞাপন দেখুন</button>
-    <button onclick="window.open('https://t.me/yourusername', '_blank')">ডেভেলপার</button>
-    <div class="footer">⚡ Ads will auto show every 30s inside Telegram</div>
+  <div class="shell">
+    <div class="card">
+      <div class="top">
+        <div class="brand">
+          <div class="logo">💎</div>
+          <div>
+            <div class="title">Glow Cash — Tap the Coin</div>
+            <div class="sub">ট্যাপ করে স্কোর বাড়াও • রিওয়ার্ড আনলক করো</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost" id="btnDev">👨‍💻 ডেভ</button>
+      </div>
+
+      <div class="stats">
+        <div class="pill"><h4>স্কোর</h4><div class="v" id="score">0</div></div>
+        <div class="pill"><h4>বেস্ট</h4><div class="v" id="best">0</div></div>
+        <div class="pill"><h4>টাইম</h4><div class="v" id="time">30s</div></div>
+      </div>
+
+      <div class="arena" id="arena">
+        <div class="coin" id="coin">৳</div>
+      </div>
+
+      <div class="row">
+        <button class="btn btn-primary" id="btnStart">▶ শুরু</button>
+        <button class="btn btn-ghost" id="btnReset">↻ রিসেট</button>
+      </div>
+
+      <div class="ad-note">ℹ️ প্রতি ৫ ট্যাপ পরপর বিজ্ঞাপন স্বয়ংক্রিয়ভাবে দেখানো হবে</div>
+    </div>
   </div>
 
   <script>
-    async function showLoopAd() {
-      try {
-        if (window.showGiga) {
-          await window.showGiga("main");
-          console.log("✅ Ad shown");
-          // 👉 এখানে reward logic বসাতে পারো
+    // --- Telegram context (optional UX) ---
+    const tg = window.Telegram?.WebApp;
+    if (tg) { try { tg.ready(); tg.expand(); } catch(_){} }
+
+    // --- Game state ---
+    const $ = id => document.getElementById(id);
+    const coin = $('coin'), arena = $('arena');
+    const scoreEl = $('score'), bestEl = $('best'), timeEl = $('time');
+
+    let playing = false, score = 0, best = Number(localStorage.getItem('gc_best')||0);
+    let timer = 30, tickId = null, adEvery = 5;
+
+    bestEl.textContent = best.toString();
+
+    function rng(min,max){ return Math.random()*(max-min)+min; }
+
+    function placeCoin(){
+      const pad = 60; // avoid edges
+      const rect = arena.getBoundingClientRect();
+      const x = rng(pad, rect.width-pad);
+      const y = rng(pad, rect.height-pad);
+      coin.style.left = x + 'px';
+      coin.style.top  = y + 'px';
+    }
+
+    function setScore(v){
+      score = v; scoreEl.textContent = score.toString();
+      if(score>best){ best = score; bestEl.textContent=best; localStorage.setItem('gc_best',best); }
+    }
+
+    function startGame(){
+      if (playing) return;
+      playing = true; setScore(0); timer = 30; timeEl.textContent = timer+'s';
+      placeCoin(); coin.style.pointerEvents = 'auto';
+      // countdown
+      tickId = setInterval(()=>{
+        timer--; timeEl.textContent = timer+'s';
+        if(timer<=0){ endGame(); }
+      },1000);
+    }
+
+    function endGame(){
+      playing = false; coin.style.pointerEvents = 'none';
+      clearInterval(tickId);
+      // show ad at game over, but not to spam
+      showAdSafe();
+      if (tg?.showAlert) tg.showAlert(`গেম শেষ! স্কোর: ${score}`);
+      else alert(`গেম শেষ! স্কোর: ${score}`);
+    }
+
+    coin.addEventListener('click', ()=>{
+      if(!playing) return;
+      setScore(score+1);
+      placeCoin();
+      // every N taps: show ad
+      if (score % adEvery === 0){ showAdSafe(); }
+    });
+
+    $('btnStart').onclick = startGame;
+    $('btnReset').onclick = ()=>{
+      setScore(0); timer = 30; timeEl.textContent = '30s'; placeCoin();
+    };
+    $('btnDev').onclick = ()=> {
+      const link = 'https://t.me/GlowCashDev';
+      if (tg?.openTelegramLink) tg.openTelegramLink(link); else window.open(link,'_blank');
+    };
+
+    // --- Ad helper: prefer Rewarded API, fallback to interstitial ---
+    let adLock = false; // prevent overlapping calls
+    async function showAdSafe(){
+      if (adLock) return;
+      adLock = true;
+      try{
+        if (typeof window.showGiga === 'function'){
+          await window.showGiga('main'); // rewarded/main placement
+        } else if (window.gigaPub){
+          await window.gigaPub.loadInterstitial();
+          window.gigaPub.showInterstitial();
         } else {
-          console.warn("⚠️ GigaPub not ready yet.");
+          console.warn('Ad SDK not ready');
         }
-      } catch (e) {
-        console.error("⚠️ Ad error:", e);
+      } catch(e){
+        console.warn('Ad error:', e);
+      } finally{
+        // small cool-down to avoid accidental loops
+        setTimeout(()=>{ adLock = false; }, 1500);
       }
     }
 
-    // Manual Ad Button
-    document.getElementById("btnAd").onclick = showLoopAd;
-
-    // Auto Loop (first after 3s, then every 30s)
-    window.addEventListener("load", () => {
-      setTimeout(() => {
-        showLoopAd();
-        setInterval(showLoopAd, 30000);
-      }, 3000);
+    // Auto ad on open (after small delay)
+    window.addEventListener('load', ()=> {
+      placeCoin();
+      setTimeout(()=> showAdSafe(), 3000);
     });
   </script>
 </body>
