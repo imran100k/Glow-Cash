@@ -1,362 +1,489 @@
 <!doctype html>
 <html lang="bn">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>JumpRun • AdExtra Rewarded Game (Demo)</title>
-  <style>
-    :root{
-      --bg:#0b1020; --card:#0f1724; --accent:#f59e0b; --text:#e6eef8;
-    }
-    *{box-sizing:border-box}
-    body{margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; background:var(--bg); color:var(--text); display:flex; min-height:100vh; align-items:center; justify-content:center; padding:20px}
-    .wrap{width:100%;max-width:820px}
-    .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-    .card{background:linear-gradient(180deg,#071025 0%, #0b1530 100%); border-radius:12px;padding:12px; box-shadow:0 8px 30px rgba(0,0,0,.6)}
-    h1{margin:0;font-size:18px}
-    .meta{font-size:13px;color:#9fb1d6}
-    canvas{display:block;background:linear-gradient(180deg,#052034,#083047); border-radius:8px; margin-top:10px;}
-    .controls{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-    button{background:var(--accent);border:0;padding:10px 12px;border-radius:10px;color:#042; font-weight:700;cursor:pointer}
-    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,.06); color:var(--text)}
-    .hud{display:flex;gap:12px;align-items:center}
-    .score-box{background:rgba(255,255,255,.03);padding:8px 12px;border-radius:999px;font-weight:700}
-    .center{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px}
-    .overlay{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center}
-    .modal{background:rgba(7,12,24,.95);padding:18px;border-radius:12px;max-width:480px;text-align:center}
-    .muted{color:#9fb1d6;font-size:14px}
-    .small{font-size:13px;color:#9fb1d6}
-    .green{color:#8ef1b6}
-  </style>
-
-  <!-- ==== AdExtra SDK: real URL from AdExtra docs should be used ==== -->
-  <!-- Example placeholder (UNCOMMENT & set your id in production): -->
-  <!-- <script src="https://adextra.io/sdk.js?app_id=YOUR_APP_ID"></script> -->
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>SkyDash — Rewarded Ad Game (Demo)</title>
+<style>
+  :root{
+    --bg:#071028; --card:#0e2036; --accent:#ffb703; --accent2:#4cc9f0; --text:#e6f0ff;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
+  body{background:linear-gradient(180deg,var(--bg),#041428);color:var(--text);display:flex;align-items:center;justify-content:center;padding:12px}
+  .wrap{width:100%;max-width:980px}
+  .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .hdr .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#ff6b6b);display:flex;align-items:center;justify-content:center;font-weight:800;color:#051923}
+  .title{font-size:18px;font-weight:700}
+  .meta{font-size:13px;color:#9bb7d9}
+  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:14px; padding:12px; box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+  canvas{width:100%;border-radius:10px;display:block;background:linear-gradient(180deg,#041426,#022036)}
+  .hud{display:flex;gap:8px;align-items:center;margin-top:8px}
+  .pill{background:rgba(255,255,255,0.03);padding:8px 12px;border-radius:999px;font-weight:700}
+  .controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  button{background:var(--accent);border:0;padding:10px 12px;border-radius:10px;color:#051923;font-weight:800;cursor:pointer}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--text)}
+  .small{font-size:13px;color:#9bb7d9}
+  .overlay{position:fixed;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(2,6,23,0.6),rgba(2,6,23,0.85));z-index:40;display:none}
+  .modal{background:linear-gradient(180deg,#072335,#042337);padding:18px;border-radius:12px;width:92%;max-width:520px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.6)}
+  .modal h2{margin:0 0 8px}
+  .muted{color:#9bb7d9}
+  .leader{margin-top:10px;text-align:left;max-height:160px;overflow:auto}
+  .leader table{width:100%;border-collapse:collapse}
+  .leader th,.leader td{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.03);font-size:13px}
+  @media(min-width:900px){canvas{height:420px}} 
+  @media(max-width:899px){canvas{height:320px}}
+</style>
+<!-- Uncomment and add your AdExtra/GigaPub SDK in production -->
+<!-- <script src="https://adextra.io/sdk.js?app_id=YOUR_APP_ID"></script> -->
+<!-- <script src="https://ad.gigapub.tech/script?id=YOUR_ID"></script> -->
 </head>
 <body>
   <div class="wrap">
-    <div class="top">
-      <div>
-        <div class="card">
-          <h1>JumpRun</h1>
-          <div class="meta">AdExtra Rewarded Demo Game — বাংলা UI</div>
+    <div class="hdr">
+      <div class="brand">
+        <div class="logo">SD</div>
+        <div>
+          <div class="title">SkyDash</div>
+          <div class="meta">Fly, collect coins, watch ads to revive — বাংলা UI</div>
         </div>
       </div>
-      <div class="card hud">
-        <div class="score-box">Score: <span id="score">0</span></div>
-        <div class="score-box">High: <span id="high">0</span></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="pill">Score: <span id="uiScore">0</span></div>
+        <div class="pill">High: <span id="uiHigh">0</span></div>
+        <div class="pill">Coins: <span id="uiCoins">0</span></div>
       </div>
     </div>
 
-    <div style="position:relative">
-      <div class="card">
-        <canvas id="game" width="760" height="360"></canvas>
-        <div class="center">
-          <div class="muted">কী কী করবেন: স্পেস/ক্লিক করে জাম্প করুন, বাধা এড়িয়ে যতদূর চলতে পারেন।</div>
-          <div class="controls">
-            <button id="startBtn">Start Game</button>
-            <button id="pauseBtn" class="btn-ghost">Pause</button>
-            <button id="soundBtn" class="btn-ghost">🔊 Sound: ON</button>
-            <button id="leaderBtn" class="btn-ghost">Leaderboard</button>
-          </div>
-        </div>
-      </div>
+    <div class="panel">
+      <canvas id="cv" width="900" height="420"></canvas>
 
-      <!-- overlay modal area -->
-      <div id="overlay" class="overlay" style="display:none">
-        <div class="modal">
-          <h3 id="modalTitle">Game Over</h3>
-          <p id="modalMsg" class="small muted">Your score: <span id="modalScore">0</span></p>
-          <div style="height:12px"></div>
-          <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-            <button id="reviveBtn">📺 Watch Ad to Continue</button>
-            <button id="retryBtn" class="btn-ghost">Retry</button>
-            <button id="closeBtn" class="btn-ghost">Close</button>
-          </div>
-          <p style="height:10px"></p>
-          <p class="small muted">Note: only testing mode will simulate ad if SDK not available.</p>
-        </div>
+      <div class="hud">
+        <div class="small">Touch / Click to flap</div>
+        <div style="flex:1"></div>
+        <div class="small">Ad Revive: <button id="adReviveBtn" class="btn-ghost">Watch Ad</button></div>
+        <div><button id="startBtn">Start</button></div>
       </div>
-    </div>
-
-    <div style="height:12px"></div>
-    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
-      <div class="card small" style="padding:10px">Ads Watched: <span id="adsWatched">0</span></div>
-      <div class="card small" style="padding:10px">Balance: <span id="balance">0.00</span> ৳</div>
+      <div class="controls">
+        <button id="leaderBtn" class="btn-ghost">Leaderboard</button>
+        <button id="shopBtn" class="btn-ghost">Shop (spend coins)</button>
+        <button id="muteBtn" class="btn-ghost">🔊</button>
+      </div>
     </div>
   </div>
 
-  <script>
-  /***************
-   * JumpRun Game *
-   * Simple runner: jump to avoid obstacles
-   * Integrates AdExtra rewarded flow (checks for window.showAdExtra)
-   * Fallback: demo simulated ad if SDK missing
-   ***************/
+  <!-- overlay modal -->
+  <div id="overlay" class="overlay">
+    <div class="modal">
+      <h2 id="modalTitle">Game Over</h2>
+      <p class="muted" id="modalMsg">Score: <span id="modalScore">0</span></p>
+      <div style="height:10px"></div>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button id="reviveBtn" class="btn">📺 Watch Ad to Revive</button>
+        <button id="coinReviveBtn" class="btn">💰 Spend 50 Coins to Revive</button>
+        <button id="retryBtn" class="btn-ghost">Retry</button>
+        <button id="closeBtn" class="btn-ghost">Close</button>
+      </div>
+      <div class="leader" id="leaderboardArea"></div>
+      <div style="height:8px"></div>
+      <div class="small muted">Note: In production use actual Ad SDK. This demo will attempt to call available SDK functions.</div>
+    </div>
+  </div>
 
-  // ----- game variables -----
-  const canvas = document.getElementById('game');
-  const ctx = canvas.getContext('2d');
-  const startBtn = document.getElementById('startBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
-  const soundBtn = document.getElementById('soundBtn');
-  const leaderBtn = document.getElementById('leaderBtn');
+<script>
+/* SkyDash — polished endless flappy-runner style game
+   - Collect coins, avoid pipes
+   - Coins used for revive option (demo)
+   - Revive by watching an ad (calls AdExtra/GigaPub if available)
+   - Leaderboard & persistence via localStorage
+   - No auto-click, no fraud
+*/
 
-  const overlay = document.getElementById('overlay');
-  const reviveBtn = document.getElementById('reviveBtn');
-  const retryBtn = document.getElementById('retryBtn');
-  const closeBtn = document.getElementById('closeBtn');
+/* ======== CONFIG ======== */
+const CONFIG = {
+  coinReward: 5,         // coins per coin pickup
+  reviveCoinCost: 50,    // coins to spend for revive
+  adReviveRewardCoins: 10, // coins granted on ad success (optional)
+  gravity: 0.5,
+  flapPower: -9.0,
+  pipeGap: 150,
+  pipeSpacing: 160,
+  speedBase: 2.6,
+  coinSize: 14
+};
 
-  const scoreEl = document.getElementById('score');
-  const highEl = document.getElementById('high');
-  const modalScore = document.getElementById('modalScore');
-  const adsWatchedEl = document.getElementById('adsWatched');
-  const balanceEl = document.getElementById('balance');
+/* ======== STATE & PERSISTENCE ======== */
+let state = {
+  score: 0,
+  high: Number(localStorage.getItem('skydash_high') || 0),
+  coins: Number(localStorage.getItem('skydash_coins') || 0),
+  leaderboard: JSON.parse(localStorage.getItem('skydash_lb') || '[]') // [{name,score,date}]
+};
 
-  // persistent state
-  let high = Number(localStorage.getItem('jr_high') || 0);
-  let totalAds = Number(localStorage.getItem('jr_ads') || 0);
-  let balance = Number(localStorage.getItem('jr_bal') || 0);
+/* ======== UI refs ======== */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const uiScore = document.getElementById('uiScore');
+const uiHigh = document.getElementById('uiHigh');
+const uiCoins = document.getElementById('uiCoins');
+const overlay = document.getElementById('overlay');
+const modalScore = document.getElementById('modalScore');
+const leaderArea = document.getElementById('leaderboardArea');
 
-  highEl.innerText = high;
-  adsWatchedEl.innerText = totalAds;
-  balanceEl.innerText = balance.toFixed(2);
+const startBtn = document.getElementById('startBtn');
+const reviveBtn = document.getElementById('reviveBtn');
+const retryBtn = document.getElementById('retryBtn');
+const closeBtn = document.getElementById('closeBtn');
+const adReviveBtn = document.getElementById('adReviveBtn');
+const coinReviveBtn = document.getElementById('coinReviveBtn');
+const leaderBtn = document.getElementById('leaderBtn');
+const shopBtn = document.getElementById('shopBtn');
+const muteBtn = document.getElementById('muteBtn');
 
-  // game state
-  let running = false, paused = false;
-  let score = 0;
-  let speed = 2.2;
-  let gravity = 0.7;
-  let player = { x:60, y:260, vy:0, w:32, h:32, onGround:true };
-  let obstacles = [];
-  let spawnTimer = 0;
-  let gameOver = false;
-  let soundOn = true;
+/* ======== GAME OBJECTS ======== */
+let player, pipes, coins, frame, running, paused, lastTimestamp, speed, score;
+let soundOn = true;
 
-  // simple sounds (optional)
-  const beep = new (window.AudioContext || window.webkitAudioContext)();
+/* ======== UTILS ======== */
+function persist(){
+  localStorage.setItem('skydash_high', state.high);
+  localStorage.setItem('skydash_coins', state.coins);
+  localStorage.setItem('skydash_lb', JSON.stringify(state.leaderboard));
+}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function rand(a,b){return a + Math.random()*(b-a);}
 
-  function sfx(freq, dur=0.06){ if(!soundOn) return; try{ const o=beep.createOscillator(); const g=beep.createGain(); o.connect(g); g.connect(beep.destination); o.type='sine'; o.frequency.value=freq; g.gain.value=0.05; o.start(); g.gain.exponentialRampToValueAtTime(0.0001, beep.currentTime + dur); o.stop(beep.currentTime + dur); } catch(e){} }
+/* ======== INIT UI ======== */
+function uiUpdate(){
+  uiScore.innerText = score;
+  uiHigh.innerText = state.high;
+  uiCoins.innerText = state.coins;
+  modalScore.innerText = score;
+}
+uiUpdate();
 
-  // controls
-  window.addEventListener('keydown', (e)=>{ if(e.code==='Space') jump(); if(e.code==='KeyP') togglePause(); });
-  canvas.addEventListener('mousedown', jump);
-  startBtn.addEventListener('click', startGame);
-  pauseBtn.addEventListener('click', togglePause);
-  soundBtn.addEventListener('click', ()=>{ soundOn = !soundOn; soundBtn.innerText = soundOn ? '🔊 Sound: ON' : '🔇 Sound: OFF'; });
-  retryBtn.addEventListener('click', ()=>{ overlay.style.display='none'; startGame(); });
-  closeBtn.addEventListener('click', ()=>{ overlay.style.display='none'; });
-  leaderBtn.addEventListener('click', ()=>{ alert('Leaderboard (demo)\\nHighscore: '+high); });
+/* ======== AUDIO (tiny) ======== */
+let audioCtx = null;
+function beep(freq, vol=0.06, t=0.06){
+  if(!soundOn) return;
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.connect(g); g.connect(audioCtx.destination);
+    o.type='sine'; o.frequency.value=freq;
+    g.gain.value=vol;
+    o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + t); o.stop(audioCtx.currentTime + t);
+  }catch(e){}
+}
 
-  reviveBtn.addEventListener('click', ()=>{ 
-    // disable to avoid multi-clicks
-    reviveBtn.disabled = true; reviveBtn.innerText = 'Loading ad...';
-    showRewardedAd()
-      .then(success => {
-        reviveBtn.disabled = false; reviveBtn.innerText = '📺 Watch Ad to Continue';
-        if(success){
-          // reward: continue game, small balance add
-          stateAfterAd(true);
-        } else {
-          alert('Ad failed or canceled.');
-        }
-      })
-      .catch(err=>{
-        reviveBtn.disabled = false; reviveBtn.innerText = '📺 Watch Ad to Continue';
-        console.error(err); alert('Ad error: '+err);
-      });
-  });
+/* ======== GAME LOGIC ======== */
+function resetGame(){
+  player = { x:90, y: cv.height/2, vy:0, w:34, h:24 };
+  pipes = [];
+  coins = [];
+  frame = 0;
+  speed = CONFIG.speedBase;
+  score = 0;
+  running = false;
+  paused = false;
+  lastTimestamp = 0;
+}
 
-  // ----- core game functions -----
-  function startGame(){
-    // reset
-    score = 0; speed = 2.2; obstacles=[]; spawnTimer=0; gameOver=false;
-    player.y = 260; player.vy = 0; player.onGround = true;
-    running = true; paused = false;
-    startBtn.innerText = 'Restart';
-    requestAnimationFrame(loop);
+function startGame(){
+  resetGame();
+  running = true;
+  lastTimestamp = performance.now();
+  requestAnimationFrame(loop);
+  startBtn.innerText = 'Restart';
+}
+
+function flap(){
+  if(!running || paused) return;
+  player.vy = CONFIG.flapPower;
+  beep(700,0.04,0.06);
+}
+
+function spawnPipe(){
+  const topH = rand(40, cv.height - CONFIG.pipeGap - 120);
+  const gap = CONFIG.pipeGap;
+  pipes.push({ x: cv.width + 20, topH, gap });
+  // spawn coin near gap
+  const cx = cv.width + 20 + 60;
+  const cy = topH + gap/2;
+  coins.push({ x: cx, y: cy, collected:false });
+}
+
+function update(dt){
+  if(!running || paused) return;
+  frame += dt;
+  // physics
+  player.vy += CONFIG.gravity;
+  player.y += player.vy;
+  if(player.y + player.h > cv.height - 20){ player.y = cv.height - 20 - player.h; player.vy = 0; gameOver(); }
+  if(player.y < -20){ player.y = -20; player.vy = 0; }
+
+  // pipes movement
+  for(let i=pipes.length-1;i>=0;i--){
+    pipes[i].x -= speed;
+    if(pipes[i].x + 80 < -10) pipes.splice(i,1);
+  }
+  // coins movement & collection
+  for(let i=coins.length-1;i>=0;i--){
+    coins[i].x -= speed;
+    if(!coins[i].collected && rectHit(player, {x:coins[i].x-8, y:coins[i].y-8, w:16, h:16})){
+      coins[i].collected = true;
+      state.coins += CONFIG.coinReward;
+      beep(1100,0.04,0.04);
+      persist();
+    }
+    if(coins[i].x < -20) coins.splice(i,1);
   }
 
-  function togglePause(){ paused = !paused; pauseBtn.innerText = paused ? 'Resume' : 'Pause'; if(!paused) requestAnimationFrame(loop); }
-
-  function jump(){
-    if(!running || paused || gameOver) return;
-    if(player.onGround){
-      player.vy = -10.5; player.onGround = false;
-      sfx(520,0.06);
-    }
+  // spawn logic
+  if(frame > 1000 - Math.min(score*6,700)){
+    spawnPipe();
+    frame = 0;
   }
 
-  function spawnObstacle(){
-    // obstacle sizes random
-    const h = 24 + Math.random()*28;
-    obstacles.push({ x:canvas.width + 20, y: 320 - h, w: 18 + Math.random()*20, h: h });
-  }
-
-  function update(dt){
-    if(paused || gameOver) return;
-    // update player
-    player.vy += gravity;
-    player.y += player.vy;
-    if(player.y >= 260){ player.y = 260; player.vy = 0; player.onGround = true; }
-
-    // update obstacles
-    for(let i=obstacles.length-1;i>=0;i--){
-      obstacles[i].x -= speed;
-      if(obstacles[i].x + obstacles[i].w < -10) obstacles.splice(i,1), score += 1, sfx(880,0.03);
+  // collision check with pipes
+  for(const p of pipes){
+    // top rect
+    if(rectHit(player, {x:p.x, y:0, w:80, h:p.topH}) || rectHit(player, {x:p.x, y:p.topH + p.gap, w:80, h:cv.height - (p.topH+p.gap)-20})){
+      gameOver();
+      return;
     }
-
-    // spawn logic
-    spawnTimer -= dt;
-    if(spawnTimer <= 0){
-      spawnObstacle();
-      spawnTimer = 900 + Math.random()*1200 - Math.min(score*10,700); // more score => faster spawn
-    }
-
-    // collision check
-    for(const o of obstacles){
-      if(rectIntersect(player.x, player.y, player.w, player.h, o.x, o.y, o.w, o.h)){
-        // hit
-        gameOver = true; running = false;
-        onGameOver();
-        return;
+    // pass through?
+    if(!p.passed && p.x + 80 < player.x){
+      p.passed = true;
+      score++;
+      speed = CONFIG.speedBase + Math.min(score*0.03, 4.0);
+      beep(880,0.02,0.03);
+      if(score % 6 === 0){ // occasionally spawn coin cluster
+        for(let i=0;i<2;i++) coins.push({ x:cv.width + 80 + i*40, y: rand(140, cv.height-140), collected:false });
       }
     }
-
-    // speed scaling
-    speed = 2.2 + Math.min(score*0.03, 4.5);
-
-    // update scoreboard display
-    scoreEl.innerText = score;
-    if(score > high){ high = score; localStorage.setItem('jr_high', high); highEl.innerText = high; }
   }
 
-  function rectIntersect(x1,y1,w1,h1,x2,y2,w2,h2){
-    return !(x2 > x1 + w1 || x2 + w2 < x1 || y2 > y1 + h1 || y2 + h2 < y1);
+  uiUpdate();
+}
+
+function rectHit(a,b){
+  return !(b.x > a.x + a.w || b.x + b.w < a.x || b.y > a.y + a.h || b.y + b.h < a.y);
+}
+
+function draw(){
+  // clear
+  ctx.clearRect(0,0,cv.width,cv.height);
+  // background gradient + simple parallax
+  // sky
+  const g = ctx.createLinearGradient(0,0,0,cv.height);
+  g.addColorStop(0,'#052033'); g.addColorStop(1,'#012236');
+  ctx.fillStyle = g; ctx.fillRect(0,0,cv.width,cv.height);
+  // distant cloud layer
+  ctx.fillStyle = 'rgba(255,255,255,0.03)';
+  for(let i=0;i<6;i++){
+    const cx = ((i*200 + performance.now()*0.02) % (cv.width+200)) - 100;
+    ctx.beginPath(); ctx.ellipse(cx, 70 + (i%2)*20, 80, 20, 0,0,Math.PI*2); ctx.fill();
   }
-
-  function draw(){
-    // clear
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    // ground
-    ctx.fillStyle = '#063244';
-    ctx.fillRect(0,320,canvas.width,40);
-
-    // player
-    ctx.fillStyle = '#f59e0b';
-    ctx.fillRect(player.x, player.y, player.w, player.h);
-
-    // obstacles
-    ctx.fillStyle = '#e86e6e';
-    for(const o of obstacles) ctx.fillRect(o.x, o.y, o.w, o.h);
-
-    // score text
-    ctx.fillStyle = '#bfe7ff';
-    ctx.font = '18px Arial';
-    ctx.fillText('Score: '+score, 12, 26);
+  // pipes
+  for(const p of pipes){
+    ctx.fillStyle = '#2b7a78';
+    ctx.fillRect(p.x, 0, 80, p.topH);
+    ctx.fillRect(p.x, p.topH + p.gap, 80, cv.height - (p.topH + p.gap) - 20);
+    // pipe highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.03)';
+    ctx.fillRect(p.x + 8, 6, 64, Math.min(16, p.topH));
   }
-
-  let lastTime = performance.now();
-  function loop(now){
-    if(!running) return;
-    const dt = now - lastTime; lastTime = now;
-    update(dt);
-    draw();
-    if(!gameOver) requestAnimationFrame(loop);
+  // coins
+  for(const c of coins){
+    if(c.collected) continue;
+    ctx.fillStyle = '#ffd166';
+    ctx.beginPath(); ctx.arc(c.x, c.y, CONFIG.coinSize/2, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+    ctx.beginPath(); ctx.arc(c.x+3, c.y-3, 4,0,Math.PI*2); ctx.fill();
   }
+  // player
+  ctx.fillStyle = '#ff6b6b';
+  ctx.fillRect(player.x, player.y, player.w, player.h);
+  // ground
+  ctx.fillStyle = '#05323a';
+  ctx.fillRect(0, cv.height-20, cv.width, 20);
+  // HUD score small
+  ctx.fillStyle = '#cfefff'; ctx.font = '16px Inter, Arial';
+  ctx.fillText('Score: '+score, 12, 24);
+}
 
-  function onGameOver(){
-    sfx(150,0.12);
-    modalScore.innerText = score;
-    overlay.style.display = 'flex';
-    // show retry & revive options
-    reviveBtn.disabled = false;
-  }
-
-  // ----- Ad integration -----
-  // This function attempts to show a rewarded ad via AdExtra.
-  // Replace 'showAdExtra' name with the real function provided by AdExtra SDK if different.
-  function showRewardedAd(){
-    return new Promise((resolve, reject) => {
-      // First: check if AdExtra provides a function
-      if(typeof window.showAdExtra === 'function'){
-        // assume signature: window.showAdExtra('rewarded').then(...).catch(...)
-        try{
-          window.showAdExtra('rewarded').then(()=>{
-            resolve(true);
-          }).catch(err=>{
-            resolve(false);
-          });
-        } catch(err){
-          resolve(false);
-        }
-        return;
-      }
-
-      // fallback: some platforms may use a different name (e.g., showGiga)
-      if(typeof window.showGiga === 'function'){
-        try{
-          window.showGiga('main').then(()=>resolve(true)).catch(()=>resolve(false));
-        } catch(e){ resolve(false); }
-        return;
-      }
-
-      // --- No real SDK found: run a Demo simulated ad (FOR DEV ONLY) ---
-      // This block will simulate an ad experience (3s) and then succeed.
-      // IMPORTANT: remove this simulation in production.
-      console.warn('Ad SDK not found — running simulated ad (DEV ONLY). Remove in production.');
-      const simulate = confirm('Ad SDK not found. Run simulated ad? (This is DEV only)");
-      if(!simulate){ resolve(false); return; }
-      // visual: simple timer then resolve true
-      let elapsed = 0;
-      reviveBtn.innerText = 'Simulating ad... 3';
-      const t = setInterval(()=>{
-        elapsed++;
-        reviveBtn.innerText = 'Simulating ad... ' + (3 - elapsed);
-        if(elapsed >= 3){
-          clearInterval(t);
-          reviveBtn.innerText = '📺 Watch Ad to Continue';
-          resolve(true); // treat as watched
-        }
-      }, 1000);
-    });
-  }
-
-  // After ad success — reward logic (revive + small balance increase)
-  function stateAfterAd(success){
-    if(!success) return;
-    // reward: continue the game — small boost and clear a few obstacles
-    // close overlay and continue: remove some obstacles and resume
-    overlay.style.display = 'none';
-    // remove nearest obstacles
-    obstacles = obstacles.slice(0, Math.max(0, obstacles.length - 2));
-    // small balance payout
-    balance += 5.00; // 5 ৳ for demonstration, set as needed
-    adsWatchedUpdate(1);
-    persistState();
-    balanceEl.innerText = balance.toFixed(2);
-    // resume
-    gameOver = false; running = true; paused = false; lastTime = performance.now();
-    requestAnimationFrame(loop);
-  }
-
-  // ----- persistence & utils -----
-  function adsWatchedUpdate(delta){
-    totalAds += delta; localStorage.setItem('jr_ads', totalAds); adsWatchedEl.innerText = totalAds;
-  }
-  function persistState(){ localStorage.setItem('jr_bal', balance); localStorage.setItem('jr_high', high); }
-
-  // initial draw
+/* main loop */
+let last = performance.now();
+function loop(now){
+  if(!running) return;
+  const dt = now - last; last = now;
+  update(dt);
   draw();
+  if(running) requestAnimationFrame(loop);
+}
 
-  // ----- simple auto-start for demo -----
-  // auto-start disabled — user should press Start
+/* game over */
+function gameOver(){
+  running = false;
+  overlay.style.display = 'flex';
+  document.getElementById('modalTitle').innerText = 'Game Over';
+  modalScore.innerText = score;
+  // update high & leaderboard
+  if(score > state.high){
+    state.high = score;
+    // ask name quick
+    const name = prompt('New Highscore! আপনার নাম লিখুন:', 'Player') || 'Player';
+    state.leaderboard.push({ name, score, date: new Date().toISOString() });
+    state.leaderboard.sort((a,b)=>b.score-a.score);
+    if(state.leaderboard.length>20) state.leaderboard.length = 20;
+  } else {
+    // optionally add to leaderboard if top 20
+    if(state.leaderboard.length < 20 || score > state.leaderboard[state.leaderboard.length-1].score){
+      const name = prompt('Leaderboard entry! নাম লিখুন:', 'Player') || 'Player';
+      state.leaderboard.push({ name, score, date: new Date().toISOString() });
+      state.leaderboard.sort((a,b)=>b.score-a.score);
+      if(state.leaderboard.length>20) state.leaderboard.length = 20;
+    }
+  }
+  persist();
+  renderLeaderboard();
+  uiUpdate();
+}
 
-  // ----- small safety: prevent self-click automation advice -----
-  // NOTE: This app intentionally does NOT provide any auto-click/self-click to manipulate real ads.
-  // Remove the simulated ad in production and use the real AdExtra SDK calls only.
+/* revive by spending coins */
+coinReviveBtn.addEventListener('click', ()=>{
+  if(state.coins >= CONFIG.reviveCoinCost){
+    state.coins -= CONFIG.reviveCoinCost;
+    persist();
+    overlay.style.display = 'none';
+    // remove nearest pipe(s) and continue
+    pipes.splice(0,2);
+    running = true; last = performance.now(); requestAnimationFrame(loop);
+  } else {
+    alert('পর্যাপ্ত কয়েন নেই — Ads দেখে রিভাইভ করুন বা খেলুন সংগ্রহ করুন।');
+  }
+});
 
-  </script>
+/* revive by watching ad (calls AdExtra/GigaPub if available) */
+reviveBtn.addEventListener('click', () => {
+  reviveBtn.disabled = true; reviveBtn.innerText = 'Loading Ad...';
+  attemptShowRewardedAd()
+    .then(success => {
+      reviveBtn.disabled = false; reviveBtn.innerText = '📺 Watch Ad to Revive';
+      if(success){
+        // grant small coin reward and resume
+        state.coins += CONFIG.adReviveRewardCoins;
+        persist();
+        overlay.style.display = 'none';
+        pipes.splice(0,3);
+        running = true; last = performance.now(); requestAnimationFrame(loop);
+        uiUpdate();
+        alert('Ad সফল! রিভাইভ ও কয়েন পুরস্কার যোগ করা হয়েছে।');
+      } else {
+        alert('Ad লোড বা দেখার সমস্যা হয়েছে। পরে চেষ্টা করুন।');
+      }
+    })
+    .catch(err => { reviveBtn.disabled = false; reviveBtn.innerText = '📺 Watch Ad to Revive'; console.error(err); alert('Ad error'); });
+});
+
+/* Attempt to call provider ad SDK */
+// Returns Promise<boolean> resolved true on success
+function attemptShowRewardedAd(){
+  return new Promise((resolve, reject) => {
+    // Try AdExtra style
+    if(typeof window.showAdExtra === 'function'){
+      try{
+        window.showAdExtra('rewarded').then(()=>resolve(true)).catch(()=>resolve(false));
+        return;
+      }catch(e){ /* fallthrough */ }
+    }
+    // Try Giga style
+    if(typeof window.showGiga === 'function'){
+      try{
+        window.showGiga('main').then(()=>resolve(true)).catch(()=>resolve(false));
+        return;
+      }catch(e){ /* fallthrough */ }
+    }
+    // No SDK available — DO NOT simulate real ad in production.
+    // We provide a safe dialog for demo only.
+    const ok = confirm('Ad SDK পাওয়া যায়নি। ডেভ মোডে সিমুলেটেড ad চালাবেন? (প্রোডাকশনে নিষিদ্ধ)');
+    if(!ok) return resolve(false);
+    // simulated demo ad (3s)
+    let t = 0; reviveBtn.innerText = 'Simulating ad... 3';
+    const timer = setInterval(()=>{
+      t++;
+      reviveBtn.innerText = 'Simulating ad... ' + (3 - t);
+      if(t>=3){ clearInterval(timer); reviveBtn.innerText = '📺 Watch Ad to Revive'; resolve(true); }
+    }, 1000);
+  });
+}
+
+/* UI control handlers */
+startBtn.addEventListener('click', ()=>{ startGame(); overlay.style.display='none'; });
+retryBtn.addEventListener('click', ()=>{ overlay.style.display='none'; startGame(); });
+closeBtn.addEventListener('click', ()=>{ overlay.style.display='none'; });
+adReviveBtn.addEventListener('click', ()=>{ // quick ad from HUD
+  attemptShowRewardedAd().then(ok=>{
+    if(ok){ state.coins += CONFIG.adReviveRewardCoins; persist(); uiUpdate(); alert('Ad সফল — কয়েন যোগ হয়েছে।'); }
+    else alert('Ad সফল হয়নি।');
+  });
+});
+leaderBtn.addEventListener('click', ()=>{ renderLeaderboard(); overlay.style.display='flex'; });
+shopBtn.addEventListener('click', ()=>{ const buy = confirm('Buy 200 coins for demo 10৳? (Demo only)'); if(buy){ state.coins+=200; persist(); uiUpdate(); alert('Coins যোগ করা হয়েছে (demo)'); }});
+muteBtn.addEventListener('click', ()=>{ soundOn = !soundOn; muteBtn.innerText = soundOn ? '🔊' : '🔇'; });
+
+/* leader render */
+function renderLeaderboard(){
+  if(state.leaderboard.length===0){ leaderArea.innerHTML = '<div class="muted">No entries yet</div>'; return; }
+  let html = '<table><thead><tr><th>নাম</th><th>স্কোর</th><th>তারিখ</th></tr></thead><tbody>';
+  for(const e of state.leaderboard.slice(0,20)){
+    html += `<tr><td>${escapeHtml(e.name)}</td><td>${e.score}</td><td class="muted">${(new Date(e.date)).toLocaleString()}</td></tr>`;
+  }
+  html += '</tbody></table>';
+  leaderArea.innerHTML = html;
+}
+
+/* simple html escape */
+function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+/* canvas resizing */
+function fitCanvas(){
+  const ratio = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = Math.floor(w * ratio);
+  cv.height = Math.floor(h * ratio);
+  ctx.setTransform(ratio,0,0,ratio,0,0);
+}
+window.addEventListener('resize', fitCanvas);
+fitCanvas();
+
+/* input */
+window.addEventListener('pointerdown', ()=>{ flap(); });
+
+/* animation start state */
+resetGame();
+drawInitial();
+
+/* initial draw frame when not running */
+function drawInitial(){
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.fillStyle = '#031827'; ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.fillStyle = '#9dd3ff'; ctx.font='20px Inter, Arial'; ctx.fillText('Press Start to Play', cv.width/2 - 80, cv.height/2 - 10);
+}
+
+/* start loop binding */
+function mainLoop(now){
+  // wrapper not used; we run loop with requestAnimationFrame in startGame()
+}
+
+/* Prevent accidental auto-play of audio on mobile until user interacts — done via beep on flap */
+
+/* final persist on unload */
+window.addEventListener('beforeunload', ()=>persist());
+
+</script>
 </body>
 </html>
